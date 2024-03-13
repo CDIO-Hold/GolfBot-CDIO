@@ -7,10 +7,10 @@ from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 
-# Create your objects here.
+# Create the ev3
 ev3 = EV3Brick()
 
-# Initialize the motors.
+# Initialize the motors
 left_wheel = Motor(Port.D)
 right_wheel = Motor(Port.A)
 
@@ -22,7 +22,7 @@ new_settings = (500, current_settings[1], current_settings[2], current_settings[
 Robot.settings(new_settings[0], new_settings[1], new_settings[2], new_settings[3])
 
 
-# 
+# This function gets two coordinates and drives the robot to the destination
 def drive_to_dest(x, y):
     # for now the robots coordinates
     current_robot_x, current_robot_y = 0, 0
