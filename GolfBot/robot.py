@@ -2,5 +2,4 @@
 class Robot:
 
     #
-    def_init_(self):
-        
+    def __init__(self):
