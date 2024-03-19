@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+from robot import Robot
+
 cap = cv2.VideoCapture(0)
 
 # Define the color range for detecting the ball for orange
@@ -44,6 +46,11 @@ while True:
     # Break the loop when the user presses 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+def detectRobot():
+    
+    return robot
+
 
 # Release the capture
 cap.release()
