@@ -43,8 +43,9 @@ while True:
 
     # Display the frame with ping pong balls detected
     cv2.imshow('Ping Pong Ball Detection', detected_frame)
-
-    print('Ping Pong Ball Detection at', ball_coords)
+    if ball_coords is not None:
+        print('Ping Pong Ball Detection at', ball_coords)
+        
     # Break the loop when 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
