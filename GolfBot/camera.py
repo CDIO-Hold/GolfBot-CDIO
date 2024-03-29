@@ -26,7 +26,7 @@ def detect_ping_pong_balls(image):
             cv2.circle(detected_image, (x, y), r, (0, 255, 0), 4)
             ball_coords.append((x, y))
 
-    return ball_coords
+    return detected_image, ball_coords
 
 
 # Capture video from webcam
@@ -38,12 +38,13 @@ while True:
     if not ret:
         break
 
-    # Detect ping pong balls
-    detected_frame = detect_ping_pong_balls(frame)
+    # Detect ping pong balls and coords
+    detected_frame, ball_coords = detect_ping_pong_balls(frame)
 
     # Display the frame with ping pong balls detected
     cv2.imshow('Ping Pong Ball Detection', detected_frame)
 
+    print('Ping Pong Ball Detection at', ball_coords)
     # Break the loop when 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
