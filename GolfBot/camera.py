@@ -18,13 +18,15 @@ def detect_ping_pong_balls(image):
 
     detected_image = image.copy()
 
+    ball_coords = []
     # Draw detected circles
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
         for (x, y, r) in circles:
             cv2.circle(detected_image, (x, y), r, (0, 255, 0), 4)
+            ball_coords.append((x, y))
 
-    return detected_image
+    return ball_coords
 
 
 # Capture video from webcam
