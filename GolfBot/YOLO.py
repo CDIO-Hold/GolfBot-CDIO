@@ -19,7 +19,7 @@ className = ['orange', 'robot', 'robot-front', 'white']
 
 while True:
     success, img = cap.read()
-    result = model(img, show=True)
+    result = model(img, stream=True)
     for r in result:
         boxes = r.boxes
         for box in boxes:
@@ -36,15 +36,19 @@ while True:
 
 
             object = int(box.cls[0])
-            #currentClass = objects[object]
+            currentClass = className[object]
 
-            #Shows class name and confidence on screen
-            cvzone.putTextRect(img, f'{className[object]} {confidence:.2f}%', (max(0, x1), max(35, y1)), scale=1, thickness=1)
+            # Shows class name and confidence on screen
+            text = ""
+            if currentClass == "white" or currentClass == "orange":
+                # Center coords
+                x = (x1 + x2) / 2
+                y = (y1 + y2) / 2
+                text = f'{className[object]} {confidence:.2f}% x={x} y={y}'
+            else:
+                text = f'{className[object]} {confidence:.2f}%'
 
-            #Center coords
-            #x = (x1 + x2) / 2
-            #y = (y1 + y2) / 2
-
+            cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1,thickness=1)
     cv2.imshow("image", img)
     cv2.waitKey(1)
 
