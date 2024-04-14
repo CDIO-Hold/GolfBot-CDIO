@@ -46,10 +46,10 @@ while True:
             bounded_box = int(x1), int(y1), int(w), int(h)
             cvzone.cornerRect(img, bounded_box)
 
+            # Confidence level for detected object
             confidence = math.ceil((box.conf[0] * 100)) / 100
 
             object_detected = int(box.cls[0])
-
             current_class = className[object_detected]
 
             # Shows class name and confidence on screen
@@ -57,13 +57,14 @@ while True:
             #if current_class == "white" or current_class == "orange": # for balls only
             if current_class == "Ball white" or current_class == "Ball orange": #for balls and walls
                 current_ball = detect_ball(current_class, x1, x2, y1, y2)
-                cvzone.putTextRect(img, f'{current_class[object_detected]} {confidence:.2f}% x={current_ball.x} y={current_ball.y}',
-                                   (max(0, x1), max(35, y1)), scale=1,thickness=1)
+                text = f'{current_class[object_detected]} {confidence:.2f}% x={current_ball.x} y={current_ball.y}'
+
+                cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
             elif current_class == 'Bounds': #walls
-                current_wall = detect_wall(current_class,x1,x2,y1,y2)
-                cvzone.putTextRect(img, f'{current_class[object_detected]} {confidence:.2f}% start={current_wall.x1, current_wall.y2} end={current_wall.x2, current_wall.y2}',
-                                   (max(0, x1), max(35, y1)), scale=1,
-                                   thickness=1)
+                current_wall = detect_wall(current_class, x1, x2, y1, y2)
+                text = f'{current_class[object_detected]} {confidence:.2f}% start={current_wall.x1, current_wall.y2} end={current_wall.x2, current_wall.y2}'
+
+                cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
             elif confidence < 0.5:
                 cvzone.putTextRect(img, f'{current_class[object_detected]} {confidence:.2f}%', (max(0, x1), max(35, y1)),
                                    scale=1,
