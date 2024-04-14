@@ -31,7 +31,7 @@ def detect_wall(class_name, x1, x2, y1, y2) -> Wall:
     #start = (x1, y2)
     #end = (x2, y2)
 
-    return Wall(class_name, x1, y2, x2, y2)
+    return Wall(class_name, x1, y1, x2, y2)
 
 while True:
     success, img = cap.read()
