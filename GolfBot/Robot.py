@@ -10,4 +10,3 @@ class Robot:
         self.facing = Direction
         self.ball_count = ball_count
         self.is_moving = is_moving
-        
