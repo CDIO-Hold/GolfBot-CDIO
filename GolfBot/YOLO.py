@@ -62,14 +62,14 @@ while True:
             if current_class == "Ball white" or current_class == "Ball orange":  # for balls and walls
                 current_ball = detect_ball(current_class, x1, x2, y1, y2)
                 text = f'{current_class[object_detected]} {confidence:.2f}% \
-                x={current_ball.position.x} y={current_ball.position.y}'
+                    x={current_ball.position.x} y={current_ball.position.y}'
 
                 cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
             elif current_class == 'Bounds':  # walls
                 current_wall = detect_wall(current_class, x1, x2, y1, y2)
                 text = f'{current_class[object_detected]} {confidence:.2f}% \
-                start={current_wall.start_position.x, current_wall.start_position.y} \
-                end={current_wall.end_position.x, current_wall.end_position.y}'
+                    start={current_wall.start_position.x, current_wall.start_position.y} \
+                    end={current_wall.end_position.x, current_wall.end_position.y}'
 
                 cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
             elif confidence < 0.5:
