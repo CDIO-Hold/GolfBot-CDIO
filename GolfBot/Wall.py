@@ -6,3 +6,5 @@ class Wall:
         self.name = name
         self.start_position = start_position
         self.end_position = end_position
+        self.is_left_wall = False
+        self.is_right_wall = False
