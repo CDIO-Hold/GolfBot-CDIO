@@ -1,6 +1,8 @@
+from GolfBot.Position import Position
+
+
 class Goal:
-    def __init__(self, name, x, y, score):
+    def __init__(self, name, position: Position, score):
         self.name = name
-        self.x = x #Center X
-        self.y = y #Center Y
+        self.position = position
         self.score = score
