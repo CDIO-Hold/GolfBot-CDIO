@@ -17,7 +17,7 @@ cap.set(3, 1280)
 cap.set(4, 720)
 
 model = YOLO('best.pt')  # NEWEST Before 3 ugers
-#model.predict("Bane3.jpg", save=True)
+#model.predict("Bane.jpg", save=True)
 
 
 className = ['egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
