@@ -1,4 +1,4 @@
-from GolfBot.Position import Position
+from GolfBot.Shared.Position import Position
 
 
 class Goal:

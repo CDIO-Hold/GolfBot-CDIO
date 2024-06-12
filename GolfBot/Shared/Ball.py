@@ -1,4 +1,4 @@
-from GolfBot.Position import Position
+from Position import Position
 
 
 class Ball:
