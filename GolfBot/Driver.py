@@ -8,12 +8,14 @@ from Angle import Angle, degrees
 class Driver:
     def __init__(self,
                  move_tank,
+                 conveyer_tank,
                  speed: Speed,
                  wheel: Circle,
                  turn_circle: Circle,
                  starting_rotation = 0.0,
                  starting_position = (0, 0)):
         self.tank = move_tank
+        self.conveyer_tank = conveyer_tank
         self.speed = speed
         self.wheel = wheel
         self.turn_circle = turn_circle
@@ -66,3 +68,11 @@ class Driver:
 
         distance = math.sqrt(delta_x*delta_x + delta_y*delta_y)
         self.drive(distance)
+
+    def run_conveyor(self, ):
+        self.conveyer_tank.on_for_rotations(self.speed.straight_speed,
+                                            self.speed.straight_speed,
+                                            10000
+                                            )
+
+
