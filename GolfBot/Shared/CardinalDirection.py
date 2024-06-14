@@ -1,5 +1,5 @@
 from enum import Enum
-import Angle
+
 
 class CardinalDirection(Enum):
     EAST = 1

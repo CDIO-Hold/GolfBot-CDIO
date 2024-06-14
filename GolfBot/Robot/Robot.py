@@ -1,5 +1,6 @@
-from Driver import Driver
-from Collector import Collector
+from .Driver import Driver
+from .Collector import Collector
+
 
 class Robot:
     def __init__(self, driver: Driver, collector: Collector, position, size, facing):

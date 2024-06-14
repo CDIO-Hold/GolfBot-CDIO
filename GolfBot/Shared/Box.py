@@ -1,4 +1,4 @@
-from Position import Position
+from .Position import Position
 
 class Box:
     def __init__(self, top_left: Position, bottom_right: Position):
