@@ -2,14 +2,9 @@ import math
 from ultralytics import YOLO
 import cv2
 import cvzone
-from GolfBot.Shared.Ball import Ball
-from GolfBot.Shared.Egg import Egg
-from GolfBot.Shared.Position import Position
-from GolfBot.Shared.Box import Box
-from GolfBot.Shared.Wall import Wall
+from GolfBot.Shared import Ball, Egg, Position, Box, Wall, CardinalDirection, Goal
 from GolfBot.Robot.Robot import Robot
-from GolfBot.Direction import Direction
-from GolfBot.Shared.Goal import Goal
+
 
 class Yolo:
 
@@ -66,7 +61,7 @@ class Yolo:
 
         #calculate the angle
         angle = math.degrees(math.atan2(y - robot_y, x - robot_x))
-        direction = Direction(angle)
+        direction = CardinalDirection(angle)
         robot.facing = direction
 
         return robot
