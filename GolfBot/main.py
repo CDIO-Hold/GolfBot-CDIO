@@ -3,16 +3,20 @@ from Driver import Driver
 from Speed import Speed
 from Circle import Circle
 
-conn = rpyc.classic.connect("192.168.124.17", 18812)
+conn = rpyc.classic.connect("192.168.196.17", 18812)
 
 ev3dev2_motor = conn.modules['ev3dev2.motor']
 ev3dev2_sensor = conn.modules['ev3dev2.sensor.lego']
 
 left_port = ev3dev2_motor.OUTPUT_C
 right_port = ev3dev2_motor.OUTPUT_B
+right_conveyor = ev3dev2_motor.OUTPUT_D
+left_conveyor = ev3dev2_motor.OUTPUT_A
 
 right = ev3dev2_motor.LargeMotor(right_port)
 left = ev3dev2_motor.LargeMotor(left_port)
+right_conveyor = ev3dev2_motor.MediumMotor(right_conveyor)
+left_conveyor = ev3dev2_motor.MediumMotor(left_conveyor)
 tank = ev3dev2_motor.MoveTank(left_port, right_port)
 tank.gyro = ev3dev2_sensor.GyroSensor()
 
@@ -41,22 +45,6 @@ from math import atan2, degrees, sqrt
 import time
 
 
-# Create the ev3
-ev3 = EV3Brick()
 
-# Initialize the motors
-right_conveyor = Motor(Port.B)
-left_conveyor = Motor(Port.C)
-left_wheel = Motor(Port.A)
-right_wheel = Motor(Port.D)
-# Run both motors at the same time for 3000 milliseconds (sucking balls in)
-#left_wheel.conveyor(800, 10000, wait=False)
-#right_wheel.conveyor(-800, 10000, wait=False)
-
-# ------Run both motors at the same time for 3000 milliseconds (spitting balls out)------
-left_conveyor.run_time(5000, 10000, wait=False)
-right_conveyor.run_time(-5000, 10000, wait=False)
-right_wheel.run_time(200, 4000, wait=False)
-left_wheel.run_time(200, 4000, wait=False)
 
 
