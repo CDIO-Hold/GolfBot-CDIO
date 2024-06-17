@@ -34,12 +34,10 @@ class Yolo:
         return wall
 
     def detect_robot(self, robot, x1, x2, y1, y2) -> Robot:
-        position = Box(x1, y1, x2, y2)
+        position = Box(Position(x1, y1), Position(x2, y2))
 
         if robot is None:
-            ball_count = 0
-            is_moving = False
-            robot = Robot(None, position, None, ball_count, is_moving)
+            robot = Robot(None, None, position, 1,CardinalDirection.NORTH)
         else:
             robot.position = position
 
@@ -55,7 +53,7 @@ class Yolo:
 
         # calculate the angle
         angle = math.degrees(math.atan2(y - robot_y, x - robot_x))
-        direction = CardinalDirection(angle)
+        direction = CardinalDirection.angle_to_cardinal(angle)
         robot.facing = direction
 
         return robot
@@ -80,7 +78,7 @@ class Yolo:
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
 
-        return Egg(self, class_name, Position(x, y))
+        return Egg(class_name, Position(x, y))
 
     def run(self):
         while True:
@@ -122,7 +120,8 @@ class Yolo:
 
                     elif current_class == "robot":
                         robot = self.detect_robot(self.robot, x1, x2, y1, y2)
-
+                        text = f'{current_class} {confidence:.2f}% coords: ={robot.position.x:2f}%, {robot.position.y:2f}%'
+                        cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                     elif current_class == "robot-front":
                         if self.robot is not None:
                             robot = self.detect_robot_front(self.robot, x1, x2, y1, y2)
