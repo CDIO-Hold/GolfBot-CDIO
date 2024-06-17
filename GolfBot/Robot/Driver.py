@@ -1,8 +1,7 @@
 import math
-from GolfBot.Shared import Position
-from GolfBot.Robot import Speed
-from GolfBot.Robot import Circle
-from GolfBot.Shared import Angle, degrees
+from GolfBot.Shared import Position, Angle
+from .Speed import Speed
+from .Circle import Circle
 
 
 class Driver:
