@@ -66,3 +66,8 @@ class Driver:
 
         distance = math.sqrt(delta_x*delta_x + delta_y*delta_y)
         self.drive(distance)
+
+    def follow_path(self, path: list):
+        for position in path:
+            target_position = Position(position[0], position[1])
+            self.drive_to(target_position)

@@ -3,24 +3,25 @@ from PathFinder import PathFinder
 
 if __name__ == "__main__":
 
-    grid = Grid(width=128, height=72)
+    grid = Grid()
     # Example detected objects with bounding box coordinates
-    x1 = 0  # Starting x-coordinate of the bounding box (left edge)
-    y1 = 100  # Starting y-coordinate of the bounding box (top edge)
-    x2 = 270# Ending x-coordinate of the bounding box (just a small width)
-    y2 = 400  # Ending y-coordinate of the bounding box (full height of the screen)
+    x1 = 680  # Starting x-coordinate of the bounding box (left edge)
+    y1 = 280  # Starting y-coordinate of the bounding box (top edge)
+    x2 = 800 # Ending x-coordinate of the bounding box (just a small width)
+    y2 = 380  # Ending y-coordinate of the bounding box (full height of the screen)
 
     detected_objects = [
         {'xmin': x1, 'ymin': y1, 'xmax': x2, 'ymax': y2, 'type': 'wall'},
         #{'xmin': 300, 'ymin': 200, 'xmax': 350, 'ymax': 250, 'type': 'wall'},
         #{'xmin': 250, 'ymin': 550, 'xmax': 300, 'ymax': 600, 'type': 'ball'}
     ]
-
     grid.add_detected_object(detected_objects)
+    grid.add_test_object(3,4)
+    grid.add_test_object(0, 3)
     grid.display_grid()
     # Example usage
-    start_position = (0, 0)
-    goal_position = (50, 20)
+    start_position = (3, 3)
+    goal_position = (7, 7)
     pathfinder = PathFinder(grid)
     path = pathfinder.astar(start_position, goal_position)
     print("Path:", path)
