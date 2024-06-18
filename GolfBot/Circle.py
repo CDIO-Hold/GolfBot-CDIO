@@ -11,13 +11,13 @@ class Circle:
             raise ValueError("Either radius or diameter has to have a value")
 
     @property
-    def diameter(self):
+    def diameter(self) -> float:
         return self.radius * 2
 
     @property
-    def circumference(self):
+    def circumference(self) -> float:
         return self.diameter * math.pi
 
     @property
-    def area(self):
+    def area(self) -> float:
         return self.radius * self.radius * math.pi

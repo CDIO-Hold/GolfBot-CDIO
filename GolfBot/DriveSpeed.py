@@ -1,4 +1,4 @@
-class Speed:
+class DriveSpeed:
     def __init__(self, straight_speed: float, rotate_speed: float = None):
         self.straight_speed = straight_speed
         # Use rotate speed. If none was given, use the straight speed as the rotate speed

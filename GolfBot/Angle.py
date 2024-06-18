@@ -20,6 +20,7 @@ degrees = AngleUnit(360.0, "degrees")
 radians = AngleUnit(2 * math.pi, "radians")
 percent = AngleUnit(100, "percent")
 
+
 class Angle:
     def __init__(self, value: float, unit: AngleUnit):
         self.value = value % unit.maximum
@@ -32,24 +33,30 @@ class Angle:
     def opposite(self):
         return Angle(self.unit.maximum - self.value, self.unit)
 
+    def get_value(self, signed=True, unit=None):
+        # If no unit is given, use the unit of this Angle
+        unit = self.unit if unit is None else unit
+
+        factor = self.unit.conversion_factor(unit)
+        value = self.value * factor
+
+        if signed:
+            cutoff = unit.maximum / 2
+            if value > cutoff:
+                value = value - unit.maximum
+
+        return value
+
     @property
     def signed_value(self):
-        cutoff = self.unit.maximum / 2
-        if self.value > cutoff:
-            return self.value - self.unit.maximum
-        else:
-            return self.value
+        return self.get_value()
 
     def __str__(self):
-        return str(self.value) + " " + str(self.unit)
+        return str(self.signed_value) + " " + str(self.unit)
 
     def __add__(self, other):
         if type(other) is Angle:
-            if self.unit == other.unit:
-                factor = 1
-            else:
-                factor = other.unit.conversion_factor(self.unit)
-            return Angle(self.value + other.value * factor, self.unit)
+            return Angle(self.value + other.get_value(unit=self.unit), self.unit)
         elif type(other) is int or type(other) is float:
             return Angle(self.value + other, self.unit)
         raise ValueError("Cannot add non-angle to an angle")
@@ -64,11 +71,7 @@ class Angle:
 
     def __eq__(self, other):
         if type(other) is Angle:
-            if self.unit == other.unit:
-                return self.value == other.value
-            factor = other.unit.conversion_factor(self.unit)
-
-            return self.value == (other.value * factor)
+            return self.value == other.get_value(unit=self.unit)
         return False
 
     def __ne__(self, other):
@@ -76,11 +79,7 @@ class Angle:
 
     def __gt__(self, other):
         if type(other) is Angle:
-            if self.unit == other.unit:
-                return self.value > other.value
-            factor = other.unit.conversion_factor(self.unit)
-
-            return self.value > (other.value * factor)
+            return self.value > other.get_value(unit=self.unit)
         return False
 
     def __ge__(self, other):
@@ -88,11 +87,7 @@ class Angle:
 
     def __lt__(self, other):
         if type(other) is Angle:
-            if self.unit == other.unit:
-                return self.value < other.value
-            factor = other.unit.conversion_factor(self.unit)
-
-            return self.value < (other.value * factor)
+            return self.value < other.get_value(unit=self.unit)
         return False
 
     def __le__(self, other):

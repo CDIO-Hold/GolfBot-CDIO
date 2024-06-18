@@ -1,64 +1,51 @@
-import rpyc
-from .Robot import Driver
-from .Robot import Speed
-from .Robot import Circle
+import math
 
+from Robot import Robot
+from DriveSpeed import DriveSpeed
+from ConnectionInfo import ConnectionInfo
+from Position import Position
+from Angle import Angle, degrees
+from Vector import Vector
 
-print("Connecting to EV3...")
-conn = rpyc.classic.connect("192.168.196.17", 18812)
-print("Connected to EV3")
+info = ConnectionInfo("192.168.124.17", 18812)
+drive_speed = DriveSpeed(40, 10)
 
-ev3dev2_motor = conn.modules['ev3dev2.motor']
-ev3dev2_sensor = conn.modules['ev3dev2.sensor.lego']
+print("Initializing robot...")
+robot = Robot(info, drive_speed, 50)
+print("Robot initialized")
 
-left_port = ev3dev2_motor.OUTPUT_C
-right_port = ev3dev2_motor.OUTPUT_B
-right_conveyor = ev3dev2_motor.OUTPUT_D
-left_conveyor = ev3dev2_motor.OUTPUT_A
+# robot.driver.drive(1000)
+# robot.driver.turn_to(90)
 
-right = ev3dev2_motor.LargeMotor(right_port)
-left = ev3dev2_motor.LargeMotor(left_port)
-right_conveyor = ev3dev2_motor.MediumMotor(right_conveyor)
-left_conveyor = ev3dev2_motor.MediumMotor(left_conveyor)
-tank = ev3dev2_motor.MoveTank(left_port, right_port)
-tank.gyro = ev3dev2_sensor.GyroSensor()
+robot.collector.stop()
+robot.driver.stop()
 
-speed = Speed(40,10)
-wheel = Circle(diameter=68.8)
-driver = Driver(tank, speed, wheel, Circle(0))
-driver.drive(1000)
-#driver.turn_to(90)
-path = [(3, 3), (2, 3), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (7, 7)]
-driver.follow_path(path)
+robot.collector.start_loading()
+robot.drive_to(Position(1000, 0))
+robot.collector.stop()
+robot.drive_to(Position(0, 0))
+robot.collector.start_unloading()
 
-
-#tank.on_for_rotations(speed, speed, rotations)
-#tank.on_for_rotations(speed, speed, rotations)
-#tank.on_for_rotations(speed, speed, -rotations)
+robot.driver.turn(Angle(90, degrees))
+robot.collector.stop()
 
 exit(0)
 
 
-'''
-  while True:
-        command = input()
-        if command == "exit":
-            break
+path = [(3, 3), (2, 3), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (7, 7), (3, 3)]
+path = [Position(point[0], point[1]) for point in path]
 
-        if command == "w":
-            #left_wheel.run_forever(speed_sp=200)
-            #right_wheel.run_forever(speed_sp=200)
-            tank.on(200,200)
-        if command == "b":
-            left_wheel.run_forever(speed_sp=-200)
-            right_wheel.run_forever(speed_sp=-200)
-        elif command == "d":
-            left_wheel.run_forever(speed_sp=200)
-            right_wheel.run_forever(speed_sp=-200)
-        elif command == "a":
-            left_wheel.run_forever(speed_sp=-200)
-            right_wheel.run_forever(speed_sp=200)
-        elif command == "s":
-            left_wheel.stop()
-            right_wheel.stop()
-'''
+# exit(0)
+
+for i, point in enumerate(path):
+    if i % 2 == 0:
+        robot.collector.start_loading()
+    else:
+        robot.collector.start_unloading()
+
+    x, y = point
+    target = Position(x * 100, y * 100)
+    print("Moving to " + str(target))
+    robot.drive_to(target)
+
+robot.collector.stop()
