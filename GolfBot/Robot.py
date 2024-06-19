@@ -1,13 +1,7 @@
 import rpyc
+from Basics import ConnectionInfo, Circle, DriveSpeed, Vector, Angle, degrees
 from Driver import Driver
 from Collector import Collector
-from ConnectionInfo import ConnectionInfo
-from Circle import Circle
-from DriveSpeed import DriveSpeed
-from Position import Position
-from Angle import Angle, degrees
-from Vector import Vector
-from RobotMathematics import AngleMath
 
 
 class Robot:
@@ -50,18 +44,18 @@ class Robot:
         else:
             self.facing = Angle(90, degrees)
 
-        if type(starting_position) is Position:
+        if type(starting_position) is Vector:
             self.position = starting_position.__copy__()
         elif type(starting_position) is tuple and len(starting_position) == 2:
-            self.position = Position.from_tuple(starting_position)
+            self.position = Vector.from_tuple(starting_position)
         else:
-            self.position = Position(0, 0)
+            self.position = Vector(0, 0)
 
     def set_rotation(self, angle: Angle):
         self.facing = angle
 
     def set_coordinates(self, x: float, y: float):
-        self.position = Position(x, y)
+        self.position = Vector(x, y)
 
     def turn_to(self, target: Angle):
         print("Turning to:", target.with_unit(degrees))
@@ -69,7 +63,7 @@ class Robot:
         self.driver.turn(turn_angle)
         self.facing = target.with_unit(degrees)
 
-    def drive_to(self, target: Position):
+    def drive_to(self, target: Vector):
         drive_vector = Vector.from_points(self.position, target)
         # print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
 
@@ -85,7 +79,7 @@ class Robot:
         self.position.x += drive_vector.x
         self.position.y += drive_vector.y
 
-    def reverse_to(self, target: Position):
+    def reverse_to(self, target: Vector):
         drive_vector = Vector.from_points(self.position, target)
         # print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
 

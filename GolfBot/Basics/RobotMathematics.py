@@ -1,6 +1,5 @@
 import math
-from Angle import Angle, radians
-from Position import Position
+from Basics import Position, Angle, radians
 
 
 class AngleMath:

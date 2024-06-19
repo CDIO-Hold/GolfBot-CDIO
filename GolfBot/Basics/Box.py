@@ -1,4 +1,4 @@
-from Position import Position
+from Basics import Position
 
 
 class Box:

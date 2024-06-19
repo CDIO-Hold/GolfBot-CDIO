@@ -1,8 +1,8 @@
-from Position import Position
+from Basics import Vector
 
 
 class Wall:
-    def __init__(self, name, start_position: Position, end_position: Position):
+    def __init__(self, name, start_position: Vector, end_position: Vector):
         self.name = name
         self.start_position = start_position
         self.end_position = end_position
