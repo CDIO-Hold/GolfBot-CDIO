@@ -22,7 +22,7 @@ class PathFinder:
                 tentative_g_score = g_score[current] + 1
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
-                    print("came from" + current)
+                    print("came from" + str(current))
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = tentative_g_score + self.taxi_distance(neighbor, goal)
                     if neighbor not in [i[1] for i in open_set]:
