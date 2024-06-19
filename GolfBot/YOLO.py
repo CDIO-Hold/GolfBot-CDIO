@@ -18,7 +18,7 @@ class Yolo:
         self.model = YOLO('best.pt')  # NEWEST Before 3 ugers
         # model.predict("Bane.jpg", save=True)
 
-        self.className = ['egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
+        self.className = ['cross', 'egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
         self.robot = None
         self.detected_objects = []
 
@@ -131,7 +131,10 @@ class Yolo:
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                         if current_wall.is_left_wall or current_wall.is_right_wall:
                             goal = self.goal_on_wall('goal', current_wall)
-                            text = f'{current_class} {confidence:.2f}% x,y'
+                            text = (f'{current_class} {confidence:.2f}% x= {(current_wall.start_position.x + current_wall.end_position.x) / 2}, '
+                                    f'y = {(current_wall.start_position.y + current_wall.end_position.y) / 2}')
+                            cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
 
                     elif current_class == "robot":
                         robot = self.detect_robot(current_class, self.robot, x1, y1, x2, y2)
