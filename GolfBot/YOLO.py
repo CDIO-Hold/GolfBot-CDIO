@@ -2,8 +2,84 @@ import math
 from ultralytics import YOLO
 import cv2
 import cvzone
-from GolfBot.Shared import Ball, Egg, Position, Box, Wall, CardinalDirection, Goal
+from GolfBot.Shared import Ball, Egg, Position, Box_Position, Wall, CardinalDirection, Goal
 from GolfBot.Robot.Robot import Robot
+from GolfBot.Shared.Cross import Cross
+
+
+def detect_ball(class_name, x1, y1, x2, y2) -> Ball:
+    # Center coords
+    x = (x1 + x2) / 2
+    y = (y1 + y2) / 2
+    return Ball(class_name, Position(x, y))
+
+
+def detect_wall(class_name, x1, y1, x2, y2) -> Wall:
+    wall = Wall(class_name, start_position=Position(x1, y1), end_position=Position(x2, y2))
+
+    image_center = 1280 / 2
+    wall.is_left_wall = (x1 < image_center and x2 < image_center)
+    wall.is_right_wall = (x1 > image_center and x2 > image_center)
+    return wall
+
+
+def detect_cross(class_name, x1, y1, x2, y2) -> Cross:
+    cross_position = Box_Position(Position(x1, y1), Position(x2, y2))
+    return Cross(class_name, cross_position)
+
+
+def detect_robot(robot, x1, y1, x2, y2) -> Robot:
+    position = Box_Position(Position(x1, y1), Position(x2, y2))
+
+    if robot is None:
+        robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
+    else:
+        robot.position = position
+
+    return robot
+
+
+def detect_robot_front(robot, x1, y1, x2, y2):
+    x = (x1 + x2) / 2
+    y = (y1 + y2) / 2
+
+    # Center of the robots coords
+    robot_x = (robot.position.x1 + robot.position.x2) / 2
+    robot_y = (robot.position.y1 + robot.position.y2) / 2
+
+    # calculate the angle
+    angle = math.degrees(math.atan2(y - robot_y, x - robot_x))
+    direction = CardinalDirection.angle_to_cardinal(angle)
+    robot.facing = direction
+
+    return robot
+
+
+def detect_goal(name, x1, y1, x2, y2) -> Goal:
+    # Center coords
+    x = (x1 + x2) / 2
+    y = (y1 + y2) / 2
+    position = Position(x, y)
+
+    return Goal(name, position, 3)
+
+
+def goal_on_wall(wall):
+    x = (wall.start_position.x + wall.end_position.x) / 2
+    y = (wall.start_position.y + wall.end_position.y) / 2
+    position = Position(x, y)
+
+    # Check if the goal is on left or right wall
+    score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
+
+    return Goal('goal', position, score)
+
+
+def detect_egg(class_name, x1, y1, x2, y2) -> Egg:
+    x = (x1 + x2) / 2
+    y = (y1 + y2) / 2
+
+    return Egg(class_name, Position(x, y))
 
 
 class Yolo:
@@ -19,66 +95,6 @@ class Yolo:
 
         self.className = ['egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
         self.robot = None
-
-    def detect_ball(self, class_name, x1, x2, y1, y2) -> Ball:
-        # Center coords
-        x = (x1 + x2) / 2
-        y = (y1 + y2) / 2
-        return Ball(class_name, Position(x, y))
-
-    def detect_wall(self, class_name, x1, x2, y1, y2) -> Wall:
-        wall = Wall(class_name, start_position=Position(x1, y1), end_position=Position(x2, y2))
-
-        wall.is_left_wall = x1 < 640
-        wall.is_right_wall = x2 > 640
-        return wall
-
-    def detect_robot(self, robot, x1, x2, y1, y2) -> Robot:
-        position = Box(Position(x1, y1), Position(x2, y2))
-
-        if robot is None:
-            robot = Robot(None, None, position, 1,CardinalDirection.NORTH)
-        else:
-            robot.position = position
-
-        return robot
-
-    def detect_robot_front(self, robot, x1, x2, y1, y2):
-        x = (x1 + x2) / 2
-        y = (y1 + y2) / 2
-
-        # Center of the robots coords
-        robot_x = (robot.position.x1 + robot.position.x2) / 2
-        robot_y = (robot.position.y1 + robot.position.y2) / 2
-
-        # calculate the angle
-        angle = math.degrees(math.atan2(y - robot_y, x - robot_x))
-        direction = CardinalDirection.angle_to_cardinal(angle)
-        robot.facing = direction
-
-        return robot
-
-    def detect_goal(self, name, x1, x2, y1, y2) -> Goal:
-        # Center coords
-        x = (x1 + x2) / 2
-        y = (y1 + y2) / 2
-        position = Position(x, y)
-
-        # Check if the goal is on left or right wall
-        return Goal(name, position, 3)
-
-    def goal_on_wall(self, wall):
-        x = (wall.start_position.x + wall.end_position.x) / 2
-        y = (wall.start_position.y + wall.end_position.y) / 2
-        position = Position(x, y)
-
-        return Goal('goal', position, 3)
-
-    def detect_egg(self, class_name, x1, x2, y1, y2) -> Egg:
-        x = (x1 + x2) / 2
-        y = (y1 + y2) / 2
-
-        return Egg(class_name, Position(x, y))
 
     def run(self):
         while True:
@@ -103,33 +119,39 @@ class Yolo:
                     # Shows class name and confidence on screen
                     text = ""
                     if current_class == "orange-ball" or current_class == "white-ball":
-                        currentBall = self.detect_ball(current_class, x1, x2, y1, y2)
-                        text = f'{current_class} {confidence:.2f}% x={currentBall.position.x} y={currentBall.position.y}'
+                        current_ball = detect_ball(current_class, x1, y1, x2, y2)
+                        text = f'{current_class} {confidence:.2f}% x={current_ball.position.x} y={current_ball.position.y}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
                     elif current_class == "wall":
-                        current_wall = self.detect_wall(current_class, x1, x2, y1, y2)
+                        current_wall = detect_wall(current_class, x1, y1, x2, y2)
                         text = f'{current_class} {confidence:.2f}% start={current_wall.start_position.x, current_wall.start_position.y} end={current_wall.end_position.x2, current_wall.end_position.y2}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
                         if current_wall.is_left_wall or current_wall.is_right_wall:
-                            goal = self.goal_on_wall(current_wall)
+                            goal = goal_on_wall(current_wall)
                             text = f'{current_class} {confidence:.2f}% x,y'
                             cvzone.putTextRect(img, text, (max(0, goal.position.x), max(35, goal.position.y)), scale=1,
                                                thickness=1)
 
                     elif current_class == "robot":
-                        robot = self.detect_robot(self.robot, x1, x2, y1, y2)
+                        robot = detect_robot(self.robot, x1, y1, x2, y2)
                         text = f'{current_class} {confidence:.2f}% coords: ={robot.position.x:2f}%, {robot.position.y:2f}%'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
                     elif current_class == "robot-front":
                         if self.robot is not None:
-                            robot = self.detect_robot_front(self.robot, x1, x2, y1, y2)
+                            robot = detect_robot_front(self.robot, x1, y1, x2, y2)
                             text = f'{current_class} {confidence:.2f}% angle={robot.facing.angle:.2f}'
                             cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
                     elif current_class == "egg":
-                        egg = self.detect_egg(current_class, x1, x2, y1, y2)
+                        egg = detect_egg(current_class, x1, y1, x2, y2)
                         text = f'{current_class} {confidence:.2f}% x={egg.position.x} y={egg.position.y}'
+                        cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+                    elif current_class == "cross":
+                        current_cross = detect_cross(current_class, x1, y1, x2, y2)
+                        text = f'{current_class} {confidence:.2f}% start={current_cross.position.top_left.x, current_cross.position.top_left.y} end={current_cross.position.bottom_right.x, current_cross.position.bottom_right.y}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
             cv2.imshow("image", img)
