@@ -4,18 +4,49 @@ from Robot import Robot
 from DriveSpeed import DriveSpeed
 from ConnectionInfo import ConnectionInfo
 from Position import Position
-from Angle import Angle, degrees
+from Angle import Angle, degrees, percent
 from Vector import Vector
 
 info = ConnectionInfo("192.168.124.17", 18812)
 drive_speed = DriveSpeed(40, 10)
 
 print("Initializing robot...")
-robot = Robot(info, drive_speed, 50)
+robot = Robot(info, drive_speed, 100)
 print("Robot initialized")
 
-# robot.driver.drive(1000)
-# robot.driver.turn_to(90)
+robot.reverse_to(Position(0, -100))
+exit(0)
+
+while True:
+    print("Current location:", robot.position)
+    print("Facing:", robot.facing)
+    action = input("What to do now?\n")
+
+    if action == "exit":
+        break
+
+    if action.startswith("goto"):
+        x, y = action.split(" ")[1].split(",")
+        target = Position(int(x), int(y))
+        robot.drive_to(target)
+    elif action == "collect":
+        robot.collector.start_loading()
+    elif action == "shoot":
+        robot.collector.start_unloading()
+    elif action == "stop":
+        robot.collector.stop()
+
+robot.driver.stop()
+robot.collector.stop()
+exit(0)
+
+for _ in range(3):
+    robot.turn_to(Angle(50, percent))
+    robot.turn_to(Angle(75, percent))
+    robot.turn_to(Angle(0, percent))
+    robot.turn_to(Angle(25, percent))
+
+exit(0)
 
 robot.collector.stop()
 robot.driver.stop()
