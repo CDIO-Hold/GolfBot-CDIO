@@ -1,6 +1,8 @@
+import math
+
 from Position import Position
 from Circle import Circle
-from Angle import Angle, degrees
+from Angle import Angle, degrees, percent
 from RobotMathematics import AngleMath, DistanceMath
 from DriveSpeed import DriveSpeed
 from Vector import Vector
@@ -18,20 +20,65 @@ class Driver:
         self.turn_circle = turn_circle
 
     def turn(self, angle: Angle):
-        turn_degrees = angle.get_value(signed=True, unit=degrees)
-        print("Turning:", turn_degrees, "degrees")
+        print("Turning:", angle)
 
-        if turn_degrees < 0:
-            self.tank.turn_left(self.speed.rotate_speed, abs(turn_degrees))
+        degree_value = abs(angle.get_value(signed=True, unit=degrees))
+        short_angle = Angle(degree_value, degrees)
+
+        if angle.signed_value < 0:
+            self.turn_right(short_angle)
         else:
-            self.tank.turn_right(self.speed.rotate_speed, turn_degrees)
+            self.turn_left(short_angle)
 
-    def drive(self, distance: float):
+    def turn_left(self, angle: Angle):
+        print("Turning left")
+        # self._turn_with_gyro(angle, "left")
+        self._turn_with_geometry(angle, "left")
+
+    def turn_right(self, angle: Angle):
+        print("Turning right")
+        # self._turn_with_gyro(angle, "right")
+        self._turn_with_geometry(angle, "right")
+
+    def _turn_with_gyro(self, angle: Angle, direction: str):
+        if direction == "right":
+            self.tank.turn_right(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
+        else:
+            self.tank.turn_left(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
+
+    def _turn_with_geometry(self, angle: Angle, direction: str):
+        turn_percent = angle.get_value(signed=False, unit=percent) / 100.0
+
+        wheel_travel_distance = self.turn_circle.circumference * turn_percent
+        wheel_rotations = wheel_travel_distance / self.wheel.circumference
+
+        if direction == "left":
+            left_speed = -self.speed.rotate_speed
+        else:
+            left_speed = self.speed.rotate_speed
+        right_speed = left_speed * -1
+
+        self.tank.on_for_rotations(
+            left_speed,
+            right_speed,
+            wheel_rotations
+        )
+
+    def forward(self, distance: float):
         rotations = distance / self.wheel.circumference
 
         self.tank.on_for_rotations(
             self.speed.straight_speed,
             self.speed.straight_speed,
+            rotations
+        )
+
+    def backward(self, distance: float):
+        rotations = distance / self.wheel.circumference
+
+        self.tank.on_for_rotations(
+            -self.speed.straight_speed,
+            -self.speed.straight_speed,
             rotations
         )
 
