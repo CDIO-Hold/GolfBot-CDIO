@@ -35,7 +35,9 @@ class Robot:
         drive_tank.gyro = ev3dev2_sensor.GyroSensor()
 
         wheel = Circle(diameter=68.8)
-        self.driver = Driver(drive_tank, drive_speed, wheel, Circle(0))  # TODO: change Circle(0)
+        wheel_distance = 111
+        turn_circle = Circle(diameter=wheel_distance)
+        self.driver = Driver(drive_tank, drive_speed, wheel, turn_circle)
 
         conveyor_steering = ev3dev2_motor.MoveSteering(left_conveyor, right_conveyor, motor_class=MediumMotor)
         self.collector = Collector(conveyor_steering, collection_speed)
@@ -46,7 +48,7 @@ class Robot:
         if type(starting_rotation) is Angle:
             self.facing = starting_rotation.with_unit(degrees)
         else:
-            self.facing = Angle(0, degrees)
+            self.facing = Angle(90, degrees)
 
         if type(starting_position) is Position:
             self.position = starting_position.__copy__()
@@ -64,17 +66,36 @@ class Robot:
     def turn_to(self, target: Angle):
         print("Turning to:", target.with_unit(degrees))
         turn_angle = target - self.facing
-        print("Turning:", turn_angle)
         self.driver.turn(turn_angle)
-        self.facing = target
+        self.facing = target.with_unit(degrees)
 
     def drive_to(self, target: Position):
         drive_vector = Vector.from_points(self.position, target)
-        print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
+        # print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
+
+        if drive_vector.length == 0:
+            print("Skipping driving")
+            return
 
         # Perform the actions
         self.turn_to(drive_vector.angle)
-        self.driver.drive(drive_vector.length)
+        self.driver.forward(drive_vector.length)
+
+        # Update state
+        self.position.x += drive_vector.x
+        self.position.y += drive_vector.y
+
+    def reverse_to(self, target: Position):
+        drive_vector = Vector.from_points(self.position, target)
+        # print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
+
+        if drive_vector.length == 0:
+            print("Skipping driving")
+            return
+
+        # Perform the actions
+        self.turn_to(drive_vector.angle * -1)
+        self.driver.backward(drive_vector.length)
 
         # Update state
         self.position.x += drive_vector.x
