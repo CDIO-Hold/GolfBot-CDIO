@@ -26,7 +26,7 @@ class Vector:
     @property
     def angle(self) -> Angle:
         # Simplified from the general formula of angle between vectors
-        return AngleMath.atan2(-self.y, self.x)
+        return AngleMath.atan2(self.y, self.x)
 
     def __str__(self):
         return "(" + str(self.x) + "; " + str(self.y) + ")"
@@ -41,4 +41,4 @@ class Vector:
 
     @staticmethod
     def angle_between(v, w) -> Angle:
-        return AngleMath.atan2(w.y * v.x - w.x * v.y, w.x * v.x + w.y * v.y)
+        return AngleMath.atan2(v.y * w.x - v.x * w.y, v.x * w.x + v.y * w.y)
