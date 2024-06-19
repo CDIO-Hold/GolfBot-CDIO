@@ -79,25 +79,27 @@ class Yolo:
 
         return Goal(name, position, 3)
 
-    def goal_on_wall(self, class_name,  wall):
+    def goal_on_wall(self, class_name, wall):
         x = (wall.start_position.x + wall.end_position.x) / 2
         y = (wall.start_position.y + wall.end_position.y) / 2
         position = Position(x, y)
 
         # Check if the goal is on left or right wall
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
-        self.add_detected_object(wall.start_position.x, wall.start_position.y, wall.end_position.x, wall.end_position.y, class_name)
+        self.add_detected_object(wall.start_position.x, wall.start_position.y, wall.end_position.x, wall.end_position.y,
+                                 class_name)
         return Goal('goal', position, score)
 
     def detect_egg(self, class_name, x1, y1, x2, y2) -> Egg:
         self.add_detected_object(x1, y1, x2, y2, class_name)
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
-        
+
         return Egg(class_name, Position(x, y))
 
     def run(self):
-        while True:
+        x = 0
+        while x < 5:
             success, img = self.cap.read()
             result = self.model(img, stream=True)
             for r in result:
@@ -125,13 +127,11 @@ class Yolo:
 
                     elif current_class == "wall":
                         current_wall = self.detect_wall(current_class, x1, y1, x2, y2)
-                        text = f'{current_class} {confidence:.2f}% start={current_wall.start_position.x, current_wall.start_position.y} end={current_wall.end_position.x2, current_wall.end_position.y2}'
+                        text = f'{current_class} {confidence:.2f}% start={current_wall.start_position.x, current_wall.start_position.y} end={current_wall.end_position.x, current_wall.end_position.y}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                         if current_wall.is_left_wall or current_wall.is_right_wall:
                             goal = self.goal_on_wall('goal', current_wall)
                             text = f'{current_class} {confidence:.2f}% x,y'
-                            cvzone.putTextRect(img, text, (max(0, goal.position.x), max(35, goal.position.y)), scale=1,
-                                               thickness=1)
 
                     elif current_class == "robot":
                         robot = self.detect_robot(current_class, self.robot, x1, y1, x2, y2)
@@ -153,6 +153,11 @@ class Yolo:
                         current_cross = self.detect_cross(current_class, x1, y1, x2, y2)
                         text = f'{current_class} {confidence:.2f}% start={current_cross.position.top_left.x, current_cross.position.top_left.y} end={current_cross.position.bottom_right.x, current_cross.position.bottom_right.y}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                    #print('objects:' + self.detected_objects.__str__() + '\n')
+            x +=1
+            if x > 5:
+                break
 
-            cv2.imshow("image", img)
-            cv2.waitKey(1)
+
+        cv2.imshow("image", img)
+        cv2.waitKey(1)

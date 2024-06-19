@@ -37,9 +37,31 @@ for point in path:
     print("Position:", driver.position)
     print("Direction:", driver.rotation)
 '''
-from GolfBot.Robot import Driver
+from GolfBot.Navigation.Grid import Grid
+from GolfBot.Navigation.PathFinder import PathFinder
+from YOLO import Yolo
 
 if __name__ == "__main__":
+    yolo = Yolo()
+
+    yolo.run()
+
+    detected_objs = yolo.detected_objects
+    print(detected_objs)
+
+    grid = Grid(1280, 720)
+    grid.add_detected_object(detected_objs)
+    grid.add_object(0,0, 6) #starting position
+    pathfinder = PathFinder(grid)
+    end_position = pathfinder.find_nearest_goal((0,0))
+    print('found the position' + str(end_position))
+
+    path = pathfinder.find_path((0,0), end_position)
+    print(path)
+
+
+
+    '''
     import rpyc
     print("RPyC imported")
     #from Robot.Driver import Driver
@@ -106,3 +128,4 @@ if __name__ == "__main__":
     #motor = ev3dev2_motor.LargeMotor(ev3dev2_motor.OUTPUT_C)
 
     print("Disconnected from the EV3")
+    '''

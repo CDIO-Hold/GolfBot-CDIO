@@ -22,6 +22,7 @@ class PathFinder:
                 tentative_g_score = g_score[current] + 1
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
+                    print("came from" + current)
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = tentative_g_score + self.taxi_distance(neighbor, goal)
                     if neighbor not in [i[1] for i in open_set]:
@@ -84,9 +85,11 @@ class PathFinder:
         return corners
 
     def find_nearest_ball(self, current_position):
+        print('searching for a ball')
         return self.water_search(current_position, 7, 100)
     def find_nearest_goal(self, current_position):
-        return self.water_search(current_position, 8, 100)
+        print('searching for a goal')
+        return self.water_search(current_position, 8, 2000)
 
     def water_search(self, current_position, search_type, radius = 5):
         current_x, current_y = current_position
