@@ -7,7 +7,7 @@ class CardinalDirection(Enum):
     WEST = 3
     SOUTH = 4
 
-    def angle_to_cardinal(angle):
+    def angle_to_cardinal(self, angle):
         if 45 <= angle < 135:
             return CardinalDirection.NORTH
         elif -45 <= angle < 45:
