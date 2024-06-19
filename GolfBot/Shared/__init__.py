@@ -1,6 +1,6 @@
 from .Angle import Angle, degrees, radians, percent
 from .Ball import Ball
-from .Box import Box
+from .Box_Position import Box_Position
 from .CardinalDirection import CardinalDirection
 from .Egg import Egg
 from .Goal import Goal
