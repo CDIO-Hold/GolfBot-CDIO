@@ -1,7 +1,7 @@
-from . import Box_Position
+from . import Box
 
 
 class Cross:
-    def __init__(self, name, position: Box_Position):
+    def __init__(self, name, position: Box):
         self.name = name
         self.position = position

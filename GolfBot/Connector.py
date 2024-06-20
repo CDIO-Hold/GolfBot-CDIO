@@ -41,3 +41,5 @@ class Connector:
             print(path)
         else:
             print('No goal or ball found.')
+            print(self.grid)
+        print(self.grid)

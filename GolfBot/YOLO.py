@@ -1,10 +1,8 @@
 import math
-import time
-
 from ultralytics import YOLO
 import cv2
 import cvzone
-from GolfBot.Shared import Ball, Egg, Position, Box_Position, Wall, CardinalDirection, Goal
+from GolfBot.Shared import Ball, Egg, Position, Box, Wall, CardinalDirection, Goal
 from GolfBot.Robot.Robot import Robot
 from GolfBot.Shared.Cross import Cross
 
@@ -45,11 +43,11 @@ class Yolo:
 
     def detect_cross(self, class_name, x1, y1, x2, y2) -> Cross:
         self.add_detected_object(x1, y1, x2, y2, class_name)
-        cross_position = Box_Position(Position(x1, y1), Position(x2, y2))
+        cross_position = Box(Position(x1, y1), Position(x2, y2))
         return Cross(class_name, cross_position)
 
     def detect_robot(self, class_name, x1, y1, x2, y2) -> Robot:
-        position = Box_Position(Position(x1, y1), Position(x2, y2))
+        position = Box(Position(x1, y1), Position(x2, y2))
 
         if self.robot is None:
             self.robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
@@ -81,7 +79,7 @@ class Yolo:
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         position = Position(x, y)
-
+        self.add_detected_object(x1, y1, x2, y2, 'goal')
         return Goal(name, position, 3)
 
     def goal_on_wall(self, class_name, wall):
@@ -93,7 +91,7 @@ class Yolo:
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
         self.add_detected_object(wall.start_position.x, wall.start_position.y, wall.end_position.x, wall.end_position.y,
                                  class_name)
-        print('goal coords:',x,y)
+        print('goal coords:', x, y)
         return Goal('goal', position, score)
 
     def detect_egg(self, class_name, x1, y1, x2, y2) -> Egg:
@@ -104,7 +102,7 @@ class Yolo:
         return Egg(class_name, Position(x, y))
 
     def run(self):
-        img = cv2.imread('BaneImage.jpg')
+        img = cv2.imread('Bane_EGG.jpg')
         if img is None:
             print(f"Error: Unable to read image at BaneImage.jpg")
             return
@@ -139,8 +137,9 @@ class Yolo:
                     if current_wall.is_left_wall or current_wall.is_right_wall:
                         goal = self.goal_on_wall('goal', current_wall)
                         cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
-
+                #elif current_class == "goal":
+                    #goal = self.detect_goal('goal', x1, y1, x2, y2)
+                    #cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
                 elif current_class == "robot":
                     robot = self.detect_robot(current_class, x1, y1, x2, y2)
                     cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)

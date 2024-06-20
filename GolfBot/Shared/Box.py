@@ -1,7 +1,7 @@
 from .Position import Position
 
 
-class Box_Position:
+class Box:
     def __init__(self, top_left: Position, bottom_right: Position):
         self.top_left = top_left
         self.bottom_right = bottom_right

@@ -1,10 +1,10 @@
 from .Driver import Driver
 from .Collector import Collector
-from ..Shared import Box_Position
+from ..Shared import Box
 
 
 class Robot:
-    def __init__(self, driver: Driver, collector: Collector, position: Box_Position, size, facing):
+    def __init__(self, driver: Driver, collector: Collector, position: Box, size, facing):
         self.driver = driver
         self.collector = collector
         self.position = position
