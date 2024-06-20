@@ -49,8 +49,8 @@ class Grid:
                     self.grid[j][i] = obj_type
 
     def get_center_coords(self, obj):
-        center_x = (obj['x_min'] + obj['x_max']) / 2
-        center_y = (obj['y_min'] + obj['y_max']) / 2
+        center_x = (obj['x_min'] + obj['x_max']) // 2
+        center_y = (obj['y_min'] + obj['y_max']) // 2
         return center_x, center_y
 
     def scaled_to(self, new_width, new_height):
@@ -60,13 +60,11 @@ class Grid:
 
         for new_y in range(new_height):
             for new_x in range(new_width):
-                # Determine the range of original grid cells that map to the new grid cell
                 start_y = int(new_y * block_height)
                 end_y = min(int((new_y) * block_height), self.height)
                 start_x = int(new_x * block_width)
                 end_x = min(int((new_x) * block_width), self.width)
 
-                # Check if any cell in the corresponding block contains a non-empty value
                 for orig_y in range(start_y, end_y):
                     for orig_x in range(start_x, end_x):
                         if self.grid[orig_y][orig_x] != 0:

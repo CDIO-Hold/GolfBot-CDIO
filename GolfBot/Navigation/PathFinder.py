@@ -16,6 +16,7 @@ class PathFinder:
             current = heapq.heappop(open_set)[1]
 
             if current == goal:
+                print("Goal reached!")
                 return self.reconstruct_path(came_from, current)
 
             for neighbor in self.get_neighbors(current, 2):
@@ -28,6 +29,7 @@ class PathFinder:
                     if neighbor not in [i[1] for i in open_set]:
                         heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
+        print("No path found")
         return []
 
     def reconstruct_path(self, came_from, current):
@@ -50,7 +52,7 @@ class PathFinder:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
             if self.is_valid_position(neighbor_x, neighbor_y, robot_size):
-                print('Neighbors: ' + str(neighbor_x) + str(neighbor_y))
+                print('Neighbors: ' + str(neighbor_x), str(neighbor_y))
                 neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors

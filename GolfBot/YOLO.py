@@ -85,14 +85,15 @@ class Yolo:
         return Goal(name, position, 3)
 
     def goal_on_wall(self, class_name, wall):
-        x = (wall.start_position.x + wall.end_position.x) / 2
-        y = (wall.start_position.y + wall.end_position.y) / 2
+        x = (wall.start_position.x + wall.end_position.x) // 2
+        y = (wall.start_position.y + wall.end_position.y) // 2
         position = Position(x, y)
 
         # Check if the goal is on left or right wall
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
         self.add_detected_object(wall.start_position.x, wall.start_position.y, wall.end_position.x, wall.end_position.y,
                                  class_name)
+        print('goal coords:',x,y)
         return Goal('goal', position, score)
 
     def detect_egg(self, class_name, x1, y1, x2, y2) -> Egg:
