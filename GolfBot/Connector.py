@@ -20,21 +20,24 @@ class Connector:
         pathfinder = PathFinder(self.grid)
 
         has_goal = False
-        has_white_ball = False
+        # has_white_ball = False
         for obj in self.yolo.detected_objects:
             if obj['type'] == 'goal':
-                goal = True
-            elif obj['type'] == 'white-ball':
-                has_white_ball = True
+                has_goal = True
+            #elif obj['type'] == 'white-ball':
+                # has_white_ball = True
 
-        start_position = (0, 0) #Robots position
-        end_position = (0, 0)
-        if has_white_ball:
-            end_position = pathfinder.find_nearest_ball((0, 0))
-        elif has_goal:
-            end_position = pathfinder.find_nearest_goal((0, 0))
+        start_position = (0, 0)  # Robot's position
+        end_position = None
+        #if has_white_ball:
+            #end_position = pathfinder.find_nearest_ball(start_position)
+        if has_goal:
+            end_position = pathfinder.find_nearest_goal(start_position)
 
-        print('found the position' + str(end_position))
+        if end_position:
+            print('found the position: ' + str(end_position))
 
-        path = pathfinder.find_path(start_position, end_position)
-        print(path)
+            path = pathfinder.find_path(start_position, end_position)
+            print(path)
+        else:
+            print('No goal or ball found.')

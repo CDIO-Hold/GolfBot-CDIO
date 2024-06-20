@@ -89,7 +89,7 @@ class PathFinder:
         return self.water_search(current_position, 7, 100)
     def find_nearest_goal(self, current_position):
         print('searching for a goal')
-        return self.water_search(current_position, 8, 2000)
+        return self.water_search(current_position, 8, 5000)
 
     def water_search(self, current_position, search_type, radius = 5):
         current_x, current_y = current_position
@@ -104,6 +104,7 @@ class PathFinder:
             if grid.cell_withing_bounds(neighbor_x, neighbor_y):
                 if self.grid[neighbor_x, neighbor_y] == search_type:
                     return neighbor_x, neighbor_y
+        return None
     def taxi_distance(self, start, goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
 

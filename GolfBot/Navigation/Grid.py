@@ -10,10 +10,6 @@ class Grid:
     def add_detected_object(self, detected_objects):
         for obj in detected_objects:
             obj_type = obj['type']
-            if obj_type == "ball":
-                print("adding ball")
-                center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 7)
             if obj_type == "goal":
                 print("adding goal")
                 center_x, center_y = self.get_center_coords(obj)
@@ -22,6 +18,14 @@ class Grid:
                 print("adding robot")
                 center_x, center_y = self.get_center_coords(obj)
                 self.add_object(center_x, center_y, 9)
+            if obj_type == "white-ball":
+                print("adding white-ball")
+                center_x, center_y = self.get_center_coords(obj)
+                self.add_object(center_x, center_y, 2)
+            if obj_type == "orange-ball":
+                print("adding orange-ball")
+                center_x, center_y = self.get_center_coords(obj)
+                self.add_object(center_x, center_y, 3)
             if obj_type == "wall":
                 print("adding wall")
                 xmin = obj['x_min']
@@ -34,13 +38,15 @@ class Grid:
     def add_object(self, x, y, obj_type):
         x = int(x)
         y = int(y)
-        self.grid[y][x] = obj_type
+        if self.cell_withing_bounds(x, y):
+            self.grid[y][x] = obj_type
 
     def add_2d_object(self, xmin, xmax, ymin, ymax, obj_type):
         for i in range(xmin, xmax):
             for j in range(ymin, ymax):
                 #print("i: " + str(i) + "j: " + str(j))
-                self.grid[j][i] = obj_type
+                if self.cell_withing_bounds(i, j):
+                    self.grid[j][i] = obj_type
 
     def get_center_coords(self, obj):
         center_x = (obj['x_min'] + obj['x_max']) / 2
