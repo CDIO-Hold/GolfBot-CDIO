@@ -1,78 +1,79 @@
-import math
-from Position import Position
-from Speed import Speed
-from Circle import Circle
-from Angle import Angle, degrees
+from Basics import Circle, DriveSpeed, Angle, degrees, percent
 
 
 class Driver:
     def __init__(self,
-                 move_tank,
-                 conveyer_tank,
-                 speed: Speed,
+                 move_steering,
+                 speed: DriveSpeed,
                  wheel: Circle,
-                 turn_circle: Circle,
-                 starting_rotation = 0.0,
-                 starting_position = (0, 0)):
-        self.tank = move_tank
-        self.conveyer_tank = conveyer_tank
+                 turn_circle: Circle):
+        self.steering = move_steering
         self.speed = speed
         self.wheel = wheel
         self.turn_circle = turn_circle
 
-        if type(starting_rotation) is float:
-            self.rotation = Angle(starting_rotation, degrees)
+    def turn(self, angle: Angle):
+        print("Turning:", angle)
+
+        degree_value = abs(angle.get_value(signed=True, unit=degrees))
+        short_angle = Angle(degree_value, degrees)
+
+        if angle.signed_value < 0:
+            self.turn_right(short_angle)
         else:
-            self.rotation = starting_rotation
+            self.turn_left(short_angle)
 
-        if type(starting_position) is tuple:
-            self.position = Position(starting_position[0], starting_position[1])
+    def turn_left(self, angle: Angle):
+        print("Turning left")
+        # self._turn_with_gyro(angle, "left")
+        self._turn_with_geometry(angle, "left")
+
+    def turn_right(self, angle: Angle):
+        print("Turning right")
+        # self._turn_with_gyro(angle, "right")
+        self._turn_with_geometry(angle, "right")
+
+    def _turn_with_gyro(self, angle: Angle, direction: str):
+        if direction == "right":
+            self.steering.turn_right(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
         else:
-            self.position = starting_position
+            self.steering.turn_left(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
 
-    def set_rotation(self, angle):
-        self.rotation = angle % 360
+    def _turn_with_geometry(self, angle: Angle, direction: str):
+        turn_percent = angle.get_value(signed=False, unit=percent) / 100.0
 
-    def set_coordinates(self, x: float, y: float):
-        self.position = Position(x, y)
+        wheel_travel_distance = self.turn_circle.circumference * turn_percent
+        wheel_rotations = wheel_travel_distance / self.wheel.circumference
 
-    def turn(self, degrees):
-        # Make the degree in the interval 0 - 360
-        degrees %= 360
+        if direction == "left":
+            left_speed = -self.speed.rotate_speed
+        else:
+            left_speed = self.speed.rotate_speed
+        right_speed = left_speed * -1
 
-        self.rotation = (self.rotation + degrees) % 360
+        self.steering.on_for_rotations(
+            left_speed,
+            right_speed,
+            wheel_rotations
+        )
 
-    def turn_to(self, target_angle):
-        target_angle = (target_angle % 360)
-
-        self.tank.turn_degrees(self.speed.rotate_speed, target_angle)
-
-    def drive(self, distance):
+    def forward(self, distance: float):
         rotations = distance / self.wheel.circumference
 
-        self.tank.on_for_rotations(
+        self.steering.on_for_rotations(
             self.speed.straight_speed,
             self.speed.straight_speed,
             rotations
         )
 
-        self.position.x += math.cos(self.rotation) * distance
-        self.position.y += math.sin(self.rotation) * distance
+    def backward(self, distance: float):
+        rotations = distance / self.wheel.circumference
 
-    def drive_to(self, target_position: Position):
-        delta_x = target_position.x - self.position.x
-        delta_y = target_position.y - self.position.y
+        self.steering.on_for_rotations(
+            -self.speed.straight_speed,
+            -self.speed.straight_speed,
+            rotations
+        )
 
-        drive_angle = math.acos(delta_x)
-        self.turn_to(drive_angle)
-
-        distance = math.sqrt(delta_x*delta_x + delta_y*delta_y)
-        self.drive(distance)
-
-    def run_conveyor(self, ):
-        self.conveyer_tank.on_for_rotations(self.speed.straight_speed,
-                                            self.speed.straight_speed,
-                                            10000
-                                            )
-
-
+    def stop(self):
+        self.steering.off()
