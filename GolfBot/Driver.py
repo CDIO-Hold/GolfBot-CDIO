@@ -3,11 +3,11 @@ from Basics import Circle, DriveSpeed, Angle, degrees, percent
 
 class Driver:
     def __init__(self,
-                 move_tank,
+                 move_steering,
                  speed: DriveSpeed,
                  wheel: Circle,
                  turn_circle: Circle):
-        self.tank = move_tank
+        self.steering = move_steering
         self.speed = speed
         self.wheel = wheel
         self.turn_circle = turn_circle
@@ -35,9 +35,9 @@ class Driver:
 
     def _turn_with_gyro(self, angle: Angle, direction: str):
         if direction == "right":
-            self.tank.turn_right(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
+            self.steering.turn_right(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
         else:
-            self.tank.turn_left(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
+            self.steering.turn_left(self.speed.rotate_speed, angle.get_value(signed=False, unit=degrees))
 
     def _turn_with_geometry(self, angle: Angle, direction: str):
         turn_percent = angle.get_value(signed=False, unit=percent) / 100.0
@@ -51,7 +51,7 @@ class Driver:
             left_speed = self.speed.rotate_speed
         right_speed = left_speed * -1
 
-        self.tank.on_for_rotations(
+        self.steering.on_for_rotations(
             left_speed,
             right_speed,
             wheel_rotations
@@ -60,7 +60,7 @@ class Driver:
     def forward(self, distance: float):
         rotations = distance / self.wheel.circumference
 
-        self.tank.on_for_rotations(
+        self.steering.on_for_rotations(
             self.speed.straight_speed,
             self.speed.straight_speed,
             rotations
@@ -69,11 +69,11 @@ class Driver:
     def backward(self, distance: float):
         rotations = distance / self.wheel.circumference
 
-        self.tank.on_for_rotations(
+        self.steering.on_for_rotations(
             -self.speed.straight_speed,
             -self.speed.straight_speed,
             rotations
         )
 
     def stop(self):
-        self.tank.off()
+        self.steering.off()

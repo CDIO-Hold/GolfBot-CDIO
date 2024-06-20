@@ -14,26 +14,21 @@ class Robot:
                  ):
         self.connection = rpyc.classic.connect(connection_info.ip_address, connection_info.port)
 
-        ev3dev2_motor = self.connection.modules['ev3dev2.motor']
-        ev3dev2_sensor = self.connection.modules['ev3dev2.sensor.lego']
+        ev3_motors = self.connection.modules['ev3dev2.motor']
 
-        LargeMotor = ev3dev2_motor.LargeMotor
-        MediumMotor = ev3dev2_motor.MediumMotor
+        left_wheel = ev3_motors.OUTPUT_B
+        right_wheel = ev3_motors.OUTPUT_C
+        left_conveyor = ev3_motors.OUTPUT_D
+        right_conveyor = ev3_motors.OUTPUT_A
 
-        left_wheel = ev3dev2_motor.OUTPUT_C
-        right_wheel = ev3dev2_motor.OUTPUT_B
-        left_conveyor = ev3dev2_motor.OUTPUT_A
-        right_conveyor = ev3dev2_motor.OUTPUT_D
-
-        drive_tank = ev3dev2_motor.MoveTank(left_wheel, right_wheel, motor_class=LargeMotor)
-        drive_tank.gyro = ev3dev2_sensor.GyroSensor()
+        drive_steering = ev3_motors.MoveSteering(left_wheel, right_wheel, motor_class=ev3_motors.LargeMotor)
 
         wheel = Circle(diameter=68.8)
         wheel_distance = 111
         turn_circle = Circle(diameter=wheel_distance)
-        self.driver = Driver(drive_tank, drive_speed, wheel, turn_circle)
+        self.driver = Driver(drive_steering, drive_speed, wheel, turn_circle)
 
-        conveyor_steering = ev3dev2_motor.MoveSteering(left_conveyor, right_conveyor, motor_class=MediumMotor)
+        conveyor_steering = ev3_motors.MoveSteering(left_conveyor, right_conveyor, motor_class=ev3_motors.MediumMotor)
         self.collector = Collector(conveyor_steering, collection_speed)
 
         # TODO

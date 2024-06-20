@@ -1,8 +1,8 @@
-from Basics import Position
+from Basics import Vector
 
 
 class Box:
-    def __init__(self, top_left: Position, bottom_right: Position):
+    def __init__(self, top_left: Vector, bottom_right: Vector):
         self.top_left = top_left
         self.bottom_right = bottom_right
 

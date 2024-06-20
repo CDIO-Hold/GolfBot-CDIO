@@ -5,11 +5,8 @@ info = ConnectionInfo("192.168.124.17", 18812)
 drive_speed = DriveSpeed(40, 10)
 
 print("Initializing robot...")
-robot = Robot(info, drive_speed, 100)
+robot = Robot(info, drive_speed, 40)
 print("Robot initialized")
-
-robot.reverse_to(Vector(0, -100))
-exit(0)
 
 while True:
     print("Current location:", robot.position)

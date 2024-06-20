@@ -1,5 +1,5 @@
 import math
-from Basics import Position, Angle, radians
+from Basics import Angle, radians
 
 
 class AngleMath:
@@ -38,23 +38,3 @@ class AngleMath:
     @staticmethod
     def tan(x) -> float:
         return math.tan(AngleMath.get_radians(x))
-
-
-class DistanceMath:
-    @staticmethod
-    def real_distance(a: Position, b: Position, squared: bool = False) -> float:
-        delta_x = b.x - a.x
-        delta_y = b.y - a.y
-
-        squared_distance = delta_x * delta_x + delta_y * delta_y
-        if squared:
-            return squared_distance
-        else:
-            return math.sqrt(squared_distance)
-
-    @staticmethod
-    def manhattan_distance(a: Position, b: Position) -> float:
-        delta_x = b.x - a.x
-        delta_y = b.y - a.y
-
-        return abs(delta_x) + abs(delta_y)
