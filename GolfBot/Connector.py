@@ -26,6 +26,8 @@ class Connector:
                 goal = True
             elif obj['type'] == 'white-ball':
                 has_white_ball = True
+
+        start_position = (0, 0) #Robots position
         end_position = (0, 0)
         if has_white_ball:
             end_position = pathfinder.find_nearest_ball((0, 0))
@@ -34,5 +36,5 @@ class Connector:
 
         print('found the position' + str(end_position))
 
-        path = pathfinder.find_path((0, 0), end_position)
+        path = pathfinder.find_path(start_position, end_position)
         print(path)
