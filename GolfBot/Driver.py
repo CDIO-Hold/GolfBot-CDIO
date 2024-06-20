@@ -1,4 +1,4 @@
-from Basics import Circle, DriveSpeed, Angle, degrees, percent
+from GolfBot.Basics import Circle, DriveSpeed, Angle, degrees, percent
 
 
 class Driver:

@@ -45,11 +45,13 @@ class Yolo:
         cross_position = Box(Vector(x1, y1), Vector(x2, y2))
         return Cross(class_name, cross_position)
 
+    #TODO: imlement so that robot is creates a robot
     def detect_robot(self, class_name, x1, y1, x2, y2) -> Robot:
         position = Box(Vector(x1, y1), Vector(x2, y2))
 
         if self.robot is None:
-            self.robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
+            pass
+            #self.robot = Robot(None, None, None, CardinalDirection.NORTH,  position)
         else:
             self.robot.position = position
 
@@ -82,13 +84,13 @@ class Yolo:
         return Goal(name, position, 3)
 
     def goal_on_wall(self, class_name, wall):
-        x = (wall.start_position.x + wall.end_position.x) // 2
-        y = (wall.start_position.y + wall.end_position.y) // 2
+        x = (wall.x1 + wall.x2) // 2
+        y = (wall.y1 + wall.y2) // 2
         position = Vector(x, y)
 
         # Check if the goal is on left or right wall
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
-        self.add_detected_object(wall.start_position.x, wall.start_position.y, wall.end_position.x, wall.end_position.y,
+        self.add_detected_object(wall.x1, wall.y1, wall.x2, wall.y2,
                                  class_name)
         print('goal coords:', x, y)
         return Goal('goal', position, score)
@@ -101,7 +103,7 @@ class Yolo:
         return Egg(class_name, Vector(x, y))
 
     def run(self):
-        img = cv2.imread('Bane_EGG.jpg')
+        img = cv2.imread('BaneImage.jpg')
         if img is None:
             print(f"Error: Unable to read image at BaneImage.jpg")
             return

@@ -1,5 +1,5 @@
 import math
-from Basics import Angle, AngleMath
+from GolfBot.Basics import Angle, AngleMath
 
 
 # (Private) Helper method for some parts of construction

@@ -1,4 +1,4 @@
-import rpyc
+#import rpyc
 from GolfBot.Basics import ConnectionInfo, Circle, DriveSpeed, Vector, Angle, degrees
 from GolfBot import Collector, Driver
 

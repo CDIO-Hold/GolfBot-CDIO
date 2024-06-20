@@ -1,4 +1,4 @@
-from Basics import Vector
+from GolfBot.Basics import Vector
 
 
 class Box:
