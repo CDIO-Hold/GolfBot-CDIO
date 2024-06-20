@@ -1,58 +1,73 @@
-#!/usr/bin/env pybricks-micropython
-from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
-                                 InfraredSensor, UltrasonicSensor, GyroSensor)
-from pybricks.parameters import Port, Stop, Direction, Button, Color
-from pybricks.tools import wait, StopWatch, DataLog
-from pybricks.robotics import DriveBase
-from pybricks.media.ev3dev import SoundFile, ImageFile
+from GolfBot import Robot
+from GolfBot.Basics import ConnectionInfo, DriveSpeed, Vector
 
-# Create the ev3
-ev3 = EV3Brick()
+info = ConnectionInfo("192.168.124.17", 18812)
+drive_speed = DriveSpeed(40, 10)
 
-# Initialize the motors
-left_wheel = Motor(Port.D)
-right_wheel = Motor(Port.A)
+print("Initializing robot...")
+robot = Robot(info, drive_speed, 40)
+print("Robot initialized")
+
+while True:
+    print("Current location:", robot.position)
+    print("Facing:", robot.facing)
+    action = input("What to do now?\n")
+
+    if action == "exit":
+        break
+
+    if action.startswith("goto"):
+        x, y = action.split(" ")[1].split(",")
+        target = Vector(int(x), int(y))
+        robot.drive_to(target)
+    elif action == "collect":
+        robot.collector.start_loading()
+    elif action == "shoot":
+        robot.collector.start_unloading()
+    elif action == "stop":
+        robot.collector.stop()
+
+robot.driver.stop()
+robot.collector.stop()
+exit(0)
+
+for _ in range(3):
+    robot.turn_to(Angle(50, percent))
+    robot.turn_to(Angle(75, percent))
+    robot.turn_to(Angle(0, percent))
+    robot.turn_to(Angle(25, percent))
+
+exit(0)
+
+robot.collector.stop()
+robot.driver.stop()
+
+robot.collector.start_loading()
+robot.drive_to(Vector(1000, 0))
+robot.collector.stop()
+robot.drive_to(Vector(0, 0))
+robot.collector.start_unloading()
+
+robot.driver.turn(Angle(90, degrees))
+robot.collector.stop()
+
+exit(0)
 
 
-# Initialize the robot
-Robot = DriveBase(left_wheel, right_wheel, wheel_diameter=65, axle_track=104)
-current_settings = robot.settings()
-new_settings = (500, current_settings[1], current_settings[2], current_settings[3])
-Robot.settings(new_settings[0], new_settings[1], new_settings[2], new_settings[3])
+path = [(3, 3), (2, 3), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (7, 7), (3, 3)]
+path = [Vector(point[0], point[1]) for point in path]
 
+# exit(0)
 
-# This function gets two coordinates and drives the robot to the destination
-def drive_to_dest(x, y):
-    # for now the robots coordinates
-    current_robot_x, current_robot_y = 0, 0
+for i, point in enumerate(path):
+    if i % 2 == 0:
+        robot.collector.start_loading()
+    else:
+        robot.collector.start_unloading()
 
-    # The distance Robot needs to drive to reach destination 
-    distance_x = x - current_robot_x
-    distance_y = y - current_robot_y
+    x, y = point
+    target = Vector(x * 100, y * 100)
+    print("Moving to " + str(target))
+    robot.drive_to(target)
 
-    # Calculate the angle to turn to
-    angle_to_turn = 50  #depends on where the (ball) is located
-
-    robot.turn(angle_to_turn)
-
-    # Drive straight to reach the coordinates
-    while Robot.distance() < distance_x:
-        Robot.straight(distance_x)
-        Robot.stop()
-        left_wheel.brake()
-        right_wheel.brake()
-
-        Robot.turn(angle_to_turn)
-
-        Robot.straight(distance_y)
-        Robot.stop()
-        left_wheel.brake()
-        right_wheel.brake()
-    
-    
-# 1 meter in x axis
-destination_x = 1000
-destination_y = 0
-
-drive_to_dest(destination_x, destination_y)
+robot.collector.stop()
