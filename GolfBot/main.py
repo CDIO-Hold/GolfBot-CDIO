@@ -1,5 +1,5 @@
-from Robot import Robot
-from Basics import ConnectionInfo, DriveSpeed, Vector
+from GolfBot import Robot
+from GolfBot.Basics import ConnectionInfo, DriveSpeed, Vector
 
 info = ConnectionInfo("192.168.124.17", 18812)
 drive_speed = DriveSpeed(40, 10)
