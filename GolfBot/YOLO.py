@@ -2,10 +2,8 @@ import math
 from ultralytics import YOLO
 import cv2
 import cvzone
-from GolfBot.Shared import Ball, Position, Box, Wall, Goal
-from GolfBot.Basics import CardinalDirection, Egg
-from GolfBot.Robot.Robot import Robot
-from GolfBot.Shared.Cross import Cross
+from GolfBot.Basics import Ball, Vector, Box, Wall, Goal, CardinalDirection, Egg, Cross
+from GolfBot.Robot import Robot
 
 
 class Yolo:
@@ -16,7 +14,7 @@ class Yolo:
         #self.cap.set(3, 1280)
         #self.cap.set(4, 720)
 
-        self.model = YOLO('best.pt')  # NEWEST model
+        self.model = YOLO('YOLO_FINAL_MODEL.pt')  # NEWEST model
         # model.predict("Bane.jpg", save=True)
 
         self.className = ['cross', 'egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
@@ -31,11 +29,11 @@ class Yolo:
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
         self.add_detected_object(x1, y1, x2, y2, class_name)
-        return Ball(class_name, Position(x, y))
+        return Ball(class_name, Vector(x, y))
 
     def detect_wall(self, class_name, x1, y1, x2, y2) -> Wall:
         self.add_detected_object(x1, y1, x2, y2, class_name)
-        wall = Wall(class_name, start_position=Position(x1, y1), end_position=Position(x2, y2))
+        wall = Wall(class_name, start_position=Vector(x1, y1), end_position=Vector(x2, y2))
 
         image_center = 1280 / 2
         wall.is_left_wall = (x1 < image_center and x2 < image_center)
@@ -44,11 +42,11 @@ class Yolo:
 
     def detect_cross(self, class_name, x1, y1, x2, y2) -> Cross:
         self.add_detected_object(x1, y1, x2, y2, class_name)
-        cross_position = Box(Position(x1, y1), Position(x2, y2))
+        cross_position = Box(Vector(x1, y1), Vector(x2, y2))
         return Cross(class_name, cross_position)
 
     def detect_robot(self, class_name, x1, y1, x2, y2) -> Robot:
-        position = Box(Position(x1, y1), Position(x2, y2))
+        position = Box(Vector(x1, y1), Vector(x2, y2))
 
         if self.robot is None:
             self.robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
@@ -79,14 +77,14 @@ class Yolo:
         # Center coords
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
-        position = Position(x, y)
+        position = Vector(x, y)
         self.add_detected_object(x1, y1, x2, y2, 'goal')
         return Goal(name, position, 3)
 
     def goal_on_wall(self, class_name, wall):
         x = (wall.start_position.x + wall.end_position.x) // 2
         y = (wall.start_position.y + wall.end_position.y) // 2
-        position = Position(x, y)
+        position = Vector(x, y)
 
         # Check if the goal is on left or right wall
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
@@ -100,7 +98,7 @@ class Yolo:
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
 
-        return Egg(class_name, Position(x, y))
+        return Egg(class_name, Vector(x, y))
 
     def run(self):
         img = cv2.imread('Bane_EGG.jpg')
@@ -139,8 +137,8 @@ class Yolo:
                         goal = self.goal_on_wall('goal', current_wall)
                         cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
                 #elif current_class == "goal":
-                    #goal = self.detect_goal('goal', x1, y1, x2, y2)
-                    #cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                #goal = self.detect_goal('goal', x1, y1, x2, y2)
+                #cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
                 elif current_class == "robot":
                     robot = self.detect_robot(current_class, x1, y1, x2, y2)
                     cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
@@ -166,6 +164,7 @@ class Yolo:
             #cv2.imshow('image', img)
             cv2.waitKey(0)  # Wait for any key press
             cv2.destroyAllWindows()
+
     '''
     def run(self):
         while True:
