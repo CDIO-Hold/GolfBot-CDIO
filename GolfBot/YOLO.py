@@ -1,4 +1,6 @@
 import math
+import time
+
 from ultralytics import YOLO
 import cv2
 import cvzone
@@ -11,11 +13,11 @@ class Yolo:
 
     def __init__(self):
         # 1 if more webcams, 0 if only one cam
-        self.cap = cv2.VideoCapture(0)
-        self.cap.set(3, 1280)
-        self.cap.set(4, 720)
+        #self.cap = cv2.VideoCapture(0)
+        #self.cap.set(3, 1280)
+        #self.cap.set(4, 720)
 
-        self.model = YOLO('best.pt')  # NEWEST Before 3 ugers
+        self.model = YOLO('best.pt')  # NEWEST model
         # model.predict("Bane.jpg", save=True)
 
         self.className = ['cross', 'egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
@@ -46,30 +48,33 @@ class Yolo:
         cross_position = Box_Position(Position(x1, y1), Position(x2, y2))
         return Cross(class_name, cross_position)
 
-    def detect_robot(self, class_name, robot, x1, y1, x2, y2) -> Robot:
+    def detect_robot(self, class_name, x1, y1, x2, y2) -> Robot:
         position = Box_Position(Position(x1, y1), Position(x2, y2))
 
-        if robot is None:
-            robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
+        if self.robot is None:
+            self.robot = Robot(None, None, position, 1, CardinalDirection.NORTH)
         else:
-            robot.position = position
+            self.robot.position = position
 
-        return robot
+        return self.robot
 
-    def detect_robot_front(self, class_name, robot, x1, y1, x2, y2):
+    def detect_robot_front(self, class_name, x1, y1, x2, y2):
+        if self.robot is None:
+            return None
+
         x = (x1 + x2) / 2
         y = (y1 + y2) / 2
 
         # Center of the robots coords
-        robot_x = (robot.position.x1 + robot.position.x2) / 2
-        robot_y = (robot.position.y1 + robot.position.y2) / 2
+        robot_x = (self.robot.position.x1 + self.robot.position.x2) / 2
+        robot_y = (self.robot.position.y1 + self.robot.position.y2) / 2
 
         # calculate the angle
         angle = math.degrees(math.atan2(y - robot_y, x - robot_x))
         direction = CardinalDirection.angle_to_cardinal(angle)
-        robot.facing = direction
-        self.add_detected_object(x1, y1, robot.position.x2, robot.position.y2, class_name)
-        return robot
+        self.robot.facing = direction
+        self.add_detected_object(x1, y1, self.robot.position.x2, self.robot.position.y2, 'robot')
+        return self.robot
 
     def detect_goal(self, name, x1, y1, x2, y2) -> Goal:
         # Center coords
@@ -98,10 +103,74 @@ class Yolo:
         return Egg(class_name, Position(x, y))
 
     def run(self):
-        x = 0
-        while x < 5:
+        img = cv2.imread('Robot.jpg')  # Read the image
+        if img is None:
+            print(f"Error: Unable to read image at BaneImage.jpg")
+            return
+
+        result = self.model(img)  # Perform object detection on the image
+
+        for r in result:
+            boxes = r.boxes
+            for box in boxes:
+                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                w, h = x2 - x1, y2 - y1
+                bounded_box = int(x1), int(y1), int(w), int(h)
+                cvzone.cornerRect(img, bounded_box)
+
+                # Confidence level for detected object
+                confidence = math.ceil((box.conf[0] * 100)) / 100
+
+                object_detected = int(box.cls[0])
+                current_class = self.className[object_detected]
+
+                # Shows class name and confidence on screen
+                text = ""
+                if current_class == "orange-ball" or current_class == "white-ball":
+                    current_ball = self.detect_ball(current_class, x1, y1, x2, y2)
+                    cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+                elif current_class == "wall":
+                    current_wall = self.detect_wall(current_class, x1, y1, x2, y2)
+                    cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                    if current_wall.is_left_wall or current_wall.is_right_wall:
+                        goal = self.goal_on_wall('goal', current_wall)
+                        cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+
+                elif current_class == "robot":
+                    robot = self.detect_robot(current_class, x1, y1, x2, y2)
+                    cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+                elif current_class == "robot-front":
+                    if self.robot is not None:
+                        robot = self.detect_robot_front(current_class, x1, y1, x2, y2)
+                        cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+                elif current_class == "egg":
+                    egg = self.detect_egg(current_class, x1, y1, x2, y2)
+                    cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+
+                elif current_class == "cross":
+                    current_cross = self.detect_cross(current_class, x1, y1, x2, y2)
+                    #cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                # print('objects:' + self.detected_objects.__str__() + '\n')
+            # Show the processed image
+            output_image = 'Robot_annotated.jpg'
+            # Save the annotated image
+            cv2.imwrite(output_image, img)
+
+            #cv2.imshow('image', img)
+            cv2.waitKey(0)  # Wait for any key press
+            cv2.destroyAllWindows()
+    '''
+    def run(self):
+        while True:
             success, img = self.cap.read()
             result = self.model(img, stream=True)
+            self.detected_objects.clear()
             for r in result:
                 boxes = r.boxes
                 for box in boxes:
@@ -131,19 +200,20 @@ class Yolo:
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                         if current_wall.is_left_wall or current_wall.is_right_wall:
                             goal = self.goal_on_wall('goal', current_wall)
-                            text = (f'{current_class} {confidence:.2f}% x= {(current_wall.start_position.x + current_wall.end_position.x) / 2}, '
-                                    f'y = {(current_wall.start_position.y + current_wall.end_position.y) / 2}')
+                            text = (
+                                f'{current_class} {confidence:.2f}% x= {(current_wall.start_position.x + current_wall.end_position.x) / 2}, '
+                                f'y = {(current_wall.start_position.y + current_wall.end_position.y) / 2}')
                             cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
 
                     elif current_class == "robot":
-                        robot = self.detect_robot(current_class, self.robot, x1, y1, x2, y2)
+                        robot = self.detect_robot(current_class, x1, y1, x2, y2)
                         text = f'{current_class} {confidence:.2f}% coords: ={robot.position.x:2f}%, {robot.position.y:2f}%'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
                     elif current_class == "robot-front":
                         if self.robot is not None:
-                            robot = self.detect_robot_front(current_class, self.robot, x1, y1, x2, y2)
+                            robot = self.detect_robot_front(current_class, x1, y1, x2, y2)
                             text = f'{current_class} {confidence:.2f}% angle={robot.facing.angle:.2f}'
                             cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
@@ -157,10 +227,11 @@ class Yolo:
                         text = f'{current_class} {confidence:.2f}% start={current_cross.position.top_left.x, current_cross.position.top_left.y} end={current_cross.position.bottom_right.x, current_cross.position.bottom_right.y}'
                         cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                     #print('objects:' + self.detected_objects.__str__() + '\n')
-            x +=1
-            if x > 5:
+            # Display the image
+            cv2.imshow("image", img)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-
-        cv2.imshow("image", img)
-        cv2.waitKey(1)
+        self.cap.release()
+        cv2.destroyAllWindows()
+    '''
