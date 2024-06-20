@@ -103,12 +103,12 @@ class Yolo:
         return Egg(class_name, Position(x, y))
 
     def run(self):
-        img = cv2.imread('Robot.jpg')  # Read the image
+        img = cv2.imread('BaneImage.jpg')
         if img is None:
             print(f"Error: Unable to read image at BaneImage.jpg")
             return
 
-        result = self.model(img)  # Perform object detection on the image
+        result = self.model(img)
 
         for r in result:
             boxes = r.boxes
@@ -158,7 +158,7 @@ class Yolo:
                     #cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                 # print('objects:' + self.detected_objects.__str__() + '\n')
             # Show the processed image
-            output_image = 'Robot_annotated.jpg'
+            output_image = 'BaneImg_annotated.jpg'
             # Save the annotated image
             cv2.imwrite(output_image, img)
 
