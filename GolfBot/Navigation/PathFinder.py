@@ -50,6 +50,7 @@ class PathFinder:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
             if self.is_valid_position(neighbor_x, neighbor_y, robot_size):
+                print('Neighbors: ' + str(neighbor_x) + str(neighbor_y))
                 neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors
