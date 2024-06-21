@@ -17,8 +17,8 @@ class Connector:
         self.grid.add_detected_object(detected_objs)
         self.grid.add_object(0, 0, 6)  # starting position
 
-        #self.grid = self.grid.scaled_to(127, 72)
-        #print(self.grid)
+        self.grid = self.grid.scaled_to(127, 72)
+        print(self.grid)
         pathfinder = PathFinder(self.grid)
         exit(0)
         has_goal = False
