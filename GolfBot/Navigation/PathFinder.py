@@ -56,6 +56,7 @@ class PathFinder:
                 neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors
+
     def is_valid_position(self, x, y, robot_size):
         within = self.grid.cell_withing_bounds(x, y)
         if not within:
@@ -63,13 +64,15 @@ class PathFinder:
         if self.grid[x, y] == 1:
             return False
         #if robot_will_colide(x, y, robot_size):
-            #return False
+        #return False
         return True
+
     def find_path(self, start, goal):
         full_path = self.astar(start, goal)
         #corner_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
         return full_path
+
     def identify_corners(self, path):
         corners = []
         for i in range(1, len(path) - 1):
@@ -90,11 +93,12 @@ class PathFinder:
     def find_nearest_ball(self, current_position):
         print('searching for a ball')
         return self.water_search(current_position, 7, 100)
+
     def find_nearest_goal(self, current_position):
         print('searching for a goal')
-        return self.water_search(current_position, 8, 5000)
+        return self.water_search(current_position, 8, 100)
 
-    def water_search(self, current_position, search_type, radius = 5):
+    def water_search(self, current_position, search_type, radius=5):
         current_x, current_y = current_position
         grid = self.grid
         # Generate movement based on radius
@@ -108,9 +112,6 @@ class PathFinder:
                 if self.grid[neighbor_x, neighbor_y] == search_type:
                     return neighbor_x, neighbor_y
         return None
+
     def taxi_distance(self, start, goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
-
-
-
-
