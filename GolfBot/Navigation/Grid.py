@@ -12,8 +12,14 @@ class Grid:
             obj_type = obj['type']
             if obj_type == "goal":
                 print("adding goal")
-                center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 8)
+                #center_x, center_y = self.get_center_coords(obj)
+                #self.add_object(center_x, center_y, 8)
+                xmin = obj['x_min']
+                xmax = obj['x_max']
+                ymin = obj['y_min']
+                ymax = obj['y_max']
+                # Iterate over the bounding box coordinates to fill the grid
+                self.add_2d_object(xmin, xmax, ymin, ymax, 8)
             if obj_type == "robot":
                 print("adding robot")
                 center_x, center_y = self.get_center_coords(obj)
@@ -26,6 +32,7 @@ class Grid:
                 print("adding orange-ball")
                 center_x, center_y = self.get_center_coords(obj)
                 self.add_object(center_x, center_y, 3)
+
             if obj_type == "wall":
                 print("adding wall")
                 xmin = obj['x_min']

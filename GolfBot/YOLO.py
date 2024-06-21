@@ -90,8 +90,8 @@ class Yolo:
 
         # Check if the goal is on left or right wall
         score = 1 if wall.is_left_wall else 2 if wall.is_right_wall else 0
-        self.add_detected_object(wall.x1, wall.y1, wall.x2, wall.y2,
-                                 class_name)
+
+        self.add_detected_object(wall.x1, y-50, wall.x2, y+50, class_name)
         print('goal coords:', x, y)
         return Goal('goal', position, score)
 
@@ -137,7 +137,7 @@ class Yolo:
                     cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                     if current_wall.is_left_wall or current_wall.is_right_wall:
                         goal = self.goal_on_wall('goal', current_wall)
-                        cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                        cvzone.putTextRect(img, 'goal', (max(0, (x1+x2)//2), max(35, (y1+y2)//2)), scale=1, thickness=1)
                 #elif current_class == "goal":
                 #goal = self.detect_goal('goal', x1, y1, x2, y2)
                 #cvzone.putTextRect(img, 'goal', (max(0, x1), max(35, y1)), scale=1, thickness=1)
