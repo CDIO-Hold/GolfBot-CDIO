@@ -20,7 +20,7 @@ class Connector:
         self.grid = self.grid.scaled_to(127, 72)
         print(self.grid)
         pathfinder = PathFinder(self.grid)
-        exit(0)
+
         has_goal = False
         # has_white_ball = False
         for obj in self.yolo.detected_objects:
@@ -41,7 +41,16 @@ class Connector:
 
             path = pathfinder.find_path(start_position, end_position)
             print(path)
+            self.visualize_path(path, start_position, end_position)
         else:
             print('No goal or ball found.')
             print(self.grid)
-        print(self.grid)
+
+    def visualize_path(self, path, start, goal):
+        display_grid = self.grid
+        for pos in path:
+            display_grid.add_object(pos[0], pos[1], 2)
+        display_grid.add_object(start[0], start[1], 6)
+        display_grid.add_object(goal[0], goal[1], 9)
+        print(display_grid)
+        #print(self.grid)
