@@ -159,14 +159,16 @@ class Yolo:
                     #cvzone.putTextRect(img, current_class, (max(0, x1), max(35, y1)), scale=1, thickness=1)
                 # print('objects:' + self.detected_objects.__str__() + '\n')
             # Show the processed image
+            print("1")
             output_image = 'BaneImg_annotated.jpg'
             # Save the annotated image
             cv2.imwrite(output_image, img)
 
+            print("2")
             #cv2.imshow('image', img)
-            cv2.waitKey(0)  # Wait for any key press
+            print("3")
             cv2.destroyAllWindows()
-
+            print("4")
     '''
     def run(self):
         while True:
