@@ -42,7 +42,6 @@ class Grid:
         y = int(y)
         if self.cell_withing_bounds(x, y):
             self.grid[y][x] = obj_type
-            print(self.grid[y][x])
 
 
     def add_2d_object(self, xmin, xmax, ymin, ymax, obj_type):
@@ -51,7 +50,6 @@ class Grid:
                 #print("i: " + str(i) + "j: " + str(j))
                 if self.cell_withing_bounds(i, j):
                     self.grid[j][i] = obj_type
-                    print(self.grid[j][i])
 
     def get_center_coords(self, obj):
         center_x = (obj['x_min'] + obj['x_max']) // 2
