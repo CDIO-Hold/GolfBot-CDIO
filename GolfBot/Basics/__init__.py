@@ -4,7 +4,6 @@ from .Angle import Angle, AngleUnit, degrees, radians, percent
 from .AngleMath import AngleMath
 from .Ball import Ball
 from .Box import Box
-from .CardinalDirection import CardinalDirection
 from .Circle import Circle
 from .ConnectionInfo import ConnectionInfo
 from .Cross import Cross

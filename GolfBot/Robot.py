@@ -1,6 +1,7 @@
-#import rpyc
-from GolfBot.Basics import ConnectionInfo, Circle, DriveSpeed, Vector, Angle, degrees
-from GolfBot import Collector, Driver
+import rpyc
+from Basics import ConnectionInfo, Circle, DriveSpeed, Vector, Angle, degrees
+from Collector import Collector
+from Driver import Driver
 
 
 class Robot:

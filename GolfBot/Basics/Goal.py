@@ -1,4 +1,4 @@
-from GolfBot.Basics import Vector
+from .Vector import Vector
 
 
 class Goal:

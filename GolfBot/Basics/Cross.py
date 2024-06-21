@@ -1,4 +1,4 @@
-from GolfBot.Basics import Box
+from .Box import Box
 
 
 class Cross:

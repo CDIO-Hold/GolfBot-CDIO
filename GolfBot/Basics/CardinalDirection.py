@@ -1,5 +1,5 @@
 from enum import Enum
-
+#TODO enum don't work with python 3.2
 
 class CardinalDirection(Enum):
     EAST = 1

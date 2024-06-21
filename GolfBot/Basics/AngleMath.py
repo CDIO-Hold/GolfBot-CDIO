@@ -1,5 +1,5 @@
 import math
-from GolfBot.Basics import Angle, radians
+from .Angle import Angle, radians
 
 
 class AngleMath:

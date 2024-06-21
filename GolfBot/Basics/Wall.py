@@ -1,4 +1,5 @@
-from GolfBot.Basics import Box, Vector
+from .Box import Box
+from .Vector import Vector
 
 
 class Wall(Box):
