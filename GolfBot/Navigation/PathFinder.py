@@ -92,7 +92,7 @@ class PathFinder:
 
     def find_nearest_ball(self, current_position):
         print('searching for a ball')
-        return self.water_search(current_position, 7, 100)
+        return self.water_search(current_position, 2, 100)
 
     def find_nearest_goal(self, current_position):
         print('searching for a goal')
