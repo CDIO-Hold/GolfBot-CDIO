@@ -21,6 +21,11 @@ class Grid:
                 print("adding robot")
                 center_x, center_y = self.get_center_coords(obj)
                 self.add_object(center_x, center_y, 9)
+                #xmin = obj['x_min']
+                #xmax = obj['x_max']
+                #ymin = obj['y_min']
+                #ymax = obj['y_max']
+                #self.add_2d_object(xmin, xmax, ymin, ymax, 9)
             elif obj_type == "white-ball":
                 print("adding white-ball")
                 center_x, center_y = self.get_center_coords(obj)
@@ -36,6 +41,20 @@ class Grid:
                 ymin = obj['y_min']
                 ymax = obj['y_max']
                 self.add_2d_object(xmin, xmax, ymin, ymax, 1)
+            elif obj_type == "cross":
+                print("adding cross")
+                xmin = obj['x_min']
+                xmax = obj['x_max']
+                ymin = obj['y_min']
+                ymax = obj['y_max']
+                self.add_2d_object(xmin, xmax, ymin, ymax, 4)
+            elif obj_type == "egg":
+                print("adding egg")
+                xmin = obj['x_min']
+                xmax = obj['x_max']
+                ymin = obj['y_min']
+                ymax = obj['y_max']
+                self.add_2d_object(xmin, xmax, ymin, ymax, 5)
 
     def add_object(self, x, y, obj_type):
         x = int(x)
