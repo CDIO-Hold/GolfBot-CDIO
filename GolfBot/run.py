@@ -1,11 +1,11 @@
-from GolfBot.Connector import Connector
-from GolfBot.YOLO import Yolo
-from GolfBot.Navigation.Grid import Grid
+from Connector import Connector
+from YOLO import Yolo
+from Navigation.Grid import Grid
 
 if __name__ == "__main__":
     yolo = Yolo()
-    grid = Grid(1920,1080)
-    conn = Connector(yolo, grid)
+    grid = Grid(1280, 720)
+    conn = Connector(yolo, grid, capture_interval=30)
     conn.run()
 
     '''
