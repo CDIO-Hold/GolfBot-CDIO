@@ -29,7 +29,7 @@ class Connector:
 
     def process_image(self, detected_objects):
         self.grid.add_detected_object(detected_objects)
-
+        #self.grid.add_detected_endpoint(detected_objects)
         self.grid = self.grid.scaled_to(128, 72)
 
         print(self.grid)

@@ -8,59 +8,55 @@ class Grid:
         self.height = height
         self.grid = [[0 for _ in range(width)] for _ in range(height)]
         self.end_points = []
+        self.staggered_end_points = []
 
     def add_detected_object(self, detected_objects):
         for obj in detected_objects:
             obj_type = obj['type']
-            if obj_type == "goal":
-                print("adding goal")
-                xmin = obj['x_min']
-                xmax = obj['x_max']
-                ymin = obj['y_min']
-                ymax = obj['y_max']
-                self.add_2d_object(xmin, xmax, ymin, ymax, 8)
-                self.add_end_point(obj)
-            elif obj_type == "robot":
-                print("adding robot")
-                center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 9)
-                #xmin = obj['x_min']
-                #xmax = obj['x_max']
-                #ymin = obj['y_min']
-                #ymax = obj['y_max']
-                #self.add_2d_object(xmin, xmax, ymin, ymax, 9)
-            elif obj_type == "white-ball":
-                print("adding white-ball")
-                center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 2)
-                self.add_end_point(obj)
-            elif obj_type == "orange-ball":
-                print("adding orange-ball")
-                center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 3)
-                self.add_end_point(obj)
-            elif obj_type == "wall":
-                print("adding wall")
-                xmin = obj['x_min']
-                xmax = obj['x_max']
-                ymin = obj['y_min']
-                ymax = obj['y_max']
-                self.add_2d_object(xmin, xmax, ymin, ymax, 1)
-            elif obj_type == "cross":
-                print("adding cross")
-                xmin = obj['x_min']
-                xmax = obj['x_max']
-                ymin = obj['y_min']
-                ymax = obj['y_max']
-                self.add_2d_object(xmin, xmax, ymin, ymax, 4)
-            elif obj_type == "egg":
-                print("adding egg")
-                xmin = obj['x_min']
-                xmax = obj['x_max']
-                ymin = obj['y_min']
-                ymax = obj['y_max']
-                self.add_2d_object(xmin, xmax, ymin, ymax, 5)
+            if obj_type == "white-ball":
+                continue
+            if obj_type == "orange-ball":
+                continue
+            print("adding object : " + obj_type)
+            xmin = obj['x_min']
+            xmax = obj['x_max']
+            ymin = obj['y_min']
+            ymax = obj['y_max']
+            print("at" + str(xmin) + " " + str(ymin))
+            self.add_2d_object(xmin, xmax, ymin, ymax, self.obj_type_to_int(obj_type))
+    def add_detected_endpoint(self, detected_objects):
+        for obj in detected_objects:
+            obj_type = obj['type']
+            if obj_type == "wall":
+                continue
+            if obj_type == "egg":
+                continue
+            if obj_type == "cross":
+                continue
+            if obj_type == "robot":
+                continue
+            print("adding endpoint : " + obj_type)
+            center_x, center_y = self.get_center_coords(obj)
+            self.add_object(center_x, center_y, self.obj_type_to_int(obj_type))
+            self.add_end_point(obj)
 
+    def obj_type_to_int(self, obj_type):
+        if obj_type == "wall":
+            return 1
+        elif obj_type == "white-ball":
+            return 2
+        elif obj_type == "orange-ball":
+            return 3
+        elif obj_type == "robot":
+            return 4
+        elif obj_type == "goal":
+            return 8
+        elif obj_type == "cross":
+            return 1
+        elif obj_type == "egg":
+            return 1
+        else:
+            return 0
     def add_object(self, x, y, obj_type):
         x = int(x)
         y = int(y)

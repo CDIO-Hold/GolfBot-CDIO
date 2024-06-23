@@ -4,7 +4,7 @@ from Navigation.Grid import Grid
 
 if __name__ == "__main__":
     yolo = Yolo()
-    grid = Grid(1280, 720)
+    grid = Grid(1920, 1080)
     conn = Connector(yolo, grid, capture_interval=30)
     conn.run()
 
