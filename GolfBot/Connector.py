@@ -52,19 +52,16 @@ class Connector:
             robot_position = (0, 0)
 
         end_position = None
-        if has_white_ball:
-            end_position = pathfinder.find_nearest_ball(robot_position)
-        if has_goal:
-            end_position = pathfinder.find_nearest_goal(robot_position)
-
-        if end_position:
+        if self.grid.end_points.lenght > 1: #should be 0
+            self.grid.sorted_end_points(robot_position)
+            end_position = self.grid.end_points[1]['center'] #should be 0
             print('Found the position:', end_position)
             path = pathfinder.find_path(robot_position, end_position)
             print(path)
             self.visualize_path(path, robot_position, end_position)
             self.send_data(path, 'goto')
         else:
-            print('No white ball found.')
+            print('no endpoints')
 
     def visualize_path(self, path, start, goal):
         display_grid = self.grid
