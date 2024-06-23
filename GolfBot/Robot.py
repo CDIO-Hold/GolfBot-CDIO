@@ -9,9 +9,9 @@ class Robot:
                  connection_info: ConnectionInfo,
                  drive_speed: DriveSpeed,
                  collection_speed: float,
-                 starting_rotation=None,
-                 starting_position=None
                  ):
+        self.starting_position = (0, 0)
+        self.starting_rotation = 0
         self.connection = rpyc.classic.connect(connection_info.ip_address, connection_info.port)
 
         ev3_motors = self.connection.modules['ev3dev2.motor']
@@ -34,20 +34,23 @@ class Robot:
         # TODO
         self.size = 10
 
-        if type(starting_rotation) is Angle:
-            self.facing = starting_rotation.with_unit(degrees)
+        if type(self.starting_rotation) is Angle:
+            self.facing = self.starting_rotation.with_unit(degrees)
         else:
             self.facing = Angle(90, degrees)
 
-        if type(starting_position) is Vector:
-            self.position = starting_position.__copy__()
-        elif type(starting_position) is tuple and len(starting_position) == 2:
-            self.position = Vector.from_tuple(starting_position)
+        if type(self.starting_position) is Vector:
+            self.position = self.starting_position.__copy__()
+        elif type(self.starting_position) is tuple and len(self.starting_position) == 2:
+            self.position = Vector.from_tuple(self.starting_position)
         else:
             self.position = Vector(0, 0)
 
     def set_rotation(self, angle: Angle):
         self.facing = angle
+
+    def set_position(self, position):
+        self.position = position
 
     def set_coordinates(self, x: float, y: float):
         self.position = Vector(x, y)
