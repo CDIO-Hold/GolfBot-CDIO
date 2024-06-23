@@ -84,14 +84,8 @@ class Grid:
         white_balls = []
         orange_balls = []
         goals = []
-        print("example enpoiint before" + str(self.end_points[0]))
         for obj in self.end_points:
-            obj_center = obj['center']
             obj_type = obj['type']
-            print("when sorting, sorting object of type: " + obj_type + " with center: " + str(obj_center))
-            # Calculate distance from the current position to the object considering walls
-            distance = self.taxi_distance(current_position, obj_center)
-
             # Check the color of the object
             if obj_type == "white-ball":
                 white_balls.append(obj)
@@ -106,7 +100,6 @@ class Grid:
 
         # Combine the sorted lists
         sorted_end_points = white_balls + orange_balls + goals
-        print("example endpoint after" + str(sorted_end_points[0]))
         self.end_points = sorted_end_points
 
     def taxi_distance(self, start, goal):

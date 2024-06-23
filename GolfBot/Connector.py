@@ -49,14 +49,15 @@ class Connector:
             print(f"Robot detected at: {robot_position}")
             self.send_data(robot_position, 'update_robot_pos')
         else:
-            robot_position = (0, 0)
+            robot_position = (3, 3)
 
         end_position = None
-        if self.grid.end_points.lenght > 1: #should be 0
+        if len(self.grid.end_points) > 0: #should be 0
             self.grid.sorted_end_points(robot_position)
             end_position = self.grid.end_points[1]['center'] #should be 0
             print('Found the position:', end_position)
             path = pathfinder.find_path(robot_position, end_position)
+            print(self.grid.end_points)
             print(path)
             self.visualize_path(path, robot_position, end_position)
             self.send_data(path, 'goto')

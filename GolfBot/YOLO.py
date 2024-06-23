@@ -105,7 +105,7 @@ class Yolo:
         end_pos = Vector(x2, y2)
         return Egg(class_name, Box(start_pos, end_pos))
 
-    '''
+
     def run(self):
         current_directory = os.path.dirname(__file__)
         image_path = os.path.join(current_directory, 'BaneImage.jpg')
@@ -167,12 +167,14 @@ class Yolo:
             # Show the processed image
             output_image = 'BaneImg_annotated.jpg'
             # Save the annotated image
-            cv2.imwrite(output_image, img)
+            #cv2.imwrite(output_image, img)
 
             #cv2.imshow('image', img)
-            cv2.waitKey(0)  # Wait for any key press
+            #cv2.waitKey(0)  # Wait for any key press
             cv2.destroyAllWindows()
-    '''
+            return img, self.detected_objects
+
+
 
     '''
     def run(self):
@@ -249,7 +251,7 @@ class Yolo:
 
             self.cap.release()
     '''
-
+'''
     def run(self):
         #self.add_detected_object(20, 20, 10, 10, 'goal')
         success, img = self.cap.read()
@@ -323,3 +325,4 @@ class Yolo:
         #cv2.destroyAllWindows()
 
         return img, self.detected_objects
+'''

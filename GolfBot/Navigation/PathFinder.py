@@ -19,11 +19,10 @@ class PathFinder:
                 print("Goal reached!")
                 return self.reconstruct_path(came_from, current)
 
-            for neighbor in self.get_neighbors(current, 2):
+            for neighbor in self.get_neighbors(current):
                 tentative_g_score = g_score[current] + 1
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
-                    print("came from" + str(current))
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = tentative_g_score + self.taxi_distance(neighbor, goal)
                     if neighbor not in [i[1] for i in open_set]:
@@ -40,7 +39,7 @@ class PathFinder:
         path.reverse()
         return path
 
-    def get_neighbors(self, node, robot_size=10):
+    def get_neighbors(self, node):
         neighbors = []
         current_x, current_y = node
 
@@ -51,26 +50,43 @@ class PathFinder:
         for dx, dy in movements:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
-            if self.is_valid_position(neighbor_x, neighbor_y, robot_size):
-                neighbors.append((neighbor_x, neighbor_y))
+            if self.is_valid_position(neighbor_x, neighbor_y):
+                if not self.will_collide(neighbor_x, neighbor_y, 2):
+                    neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors
 
-    def is_valid_position(self, x, y, robot_size):
+    def is_valid_position(self, x, y):
         within = self.grid.cell_withing_bounds(x, y)
         if not within:
             return False
         if self.grid[x, y] == 1:
             return False
-        #if robot_will_colide(x, y, robot_size):
-        #return False
         return True
+
+    def will_collide(self, neighbor_x, neighbor_y, robot_size):
+        collision = False
+        for i in range(0, robot_size):
+            for j in range(0, robot_size):
+                if not self.is_valid_position(neighbor_x + i, neighbor_y + j):
+                    print("will collide at: ", neighbor_x + i, neighbor_y + j)
+                    collision = True
+                if not self.is_valid_position(neighbor_x + i, neighbor_y - j):
+                    print("will collide at: ", neighbor_x + i, neighbor_y - j)
+                    collision = True
+                if not self.is_valid_position(neighbor_x - i, neighbor_y + j):
+                    print("will collide at: ", neighbor_x - i, neighbor_y + j)
+                    collision = True
+                if not self.is_valid_position(neighbor_x - i, neighbor_y - j):
+                    print("will collide at: ", neighbor_x - i, neighbor_y - j)
+                    collision = True
+        return collision
 
     def find_path(self, start, goal):
         full_path = self.astar(start, goal)
-        corner_path = self.identify_corners(full_path)
+        #corner_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
-        return corner_path
+        return full_path
 
     def identify_corners(self, path):
         corners = []
@@ -92,11 +108,8 @@ class PathFinder:
     def find_nearest_ball(self, current_position):
         print('searching for a ball')
 
-
     def find_nearest_goal(self, current_position):
         print('searching for a goal')
 
-
     def taxi_distance(self, start, goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])
-
