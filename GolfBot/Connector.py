@@ -36,7 +36,7 @@ class Connector:
             #end_position = pathfinder.find_nearest_ball(start_position)
         if has_goal:
             print("printing end points: " + str(self.grid.end_points))
-            self.grid.end_points = self.grid.sorted_end_points(start_position)
+            self.grid.sorted_end_points(start_position)
             print("printing end points: " + str(self.grid.end_points))
             print(self.grid.end_points[0])
             #end_position = (20, 29)

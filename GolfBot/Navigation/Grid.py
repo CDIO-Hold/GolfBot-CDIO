@@ -88,7 +88,7 @@ class Grid:
         # Combine the sorted lists
         sorted_end_points = white_balls + orange_balls + goals
         print("example endpoint after" + str(sorted_end_points[0]))
-        return sorted_end_points
+        self.end_points = sorted_end_points
 
     def taxi_distance(self, start, goal):
         return abs(start[0] - goal[0]) + abs(start[1] - goal[1])

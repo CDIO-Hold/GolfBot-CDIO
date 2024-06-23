@@ -68,9 +68,9 @@ class PathFinder:
 
     def find_path(self, start, goal):
         full_path = self.astar(start, goal)
-        #corner_path = self.identify_corners(full_path)
+        corner_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
-        return full_path
+        return corner_path
 
     def identify_corners(self, path):
         corners = []
