@@ -62,7 +62,7 @@ class Vector:
             return self.x
         elif item == 1:
             return self.y
-        raise IndexError("Vector only contains x and y (not '" + str(key) + "')")
+        raise IndexError("Vector only contains x and y (not '" + str(item) + "')")
 
     def __setitem__(self, key: int, value: int):
         if key == 0:
