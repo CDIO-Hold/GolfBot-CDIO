@@ -33,3 +33,6 @@ class Box:
     @property
     def dimensions(self) -> (float, float):
         return self.width, self.height
+
+    def get_center(self):
+        return Vector((self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2)

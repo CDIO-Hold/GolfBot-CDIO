@@ -1,6 +1,6 @@
-from Connector import Connector
+from GolfBot.Server.Connector import Connector
 from YOLO import Yolo
-from Navigation.Grid import Grid
+from GolfBot.Server.Navigation.Grid import Grid
 
 if __name__ == "__main__":
     yolo = Yolo()

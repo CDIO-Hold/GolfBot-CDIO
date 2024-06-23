@@ -2,28 +2,21 @@ import math
 from ultralytics import YOLO
 import cv2
 import cvzone
-from Basics import Ball, Vector, Box, Wall, Goal, CardinalDirection, Egg, Cross, AngleMath
+from GolfBot.Server.Basics import Vector, Box, CardinalDirection, AngleMath
 import os
+from GolfBot.Server.ImageRecognition import DetectedObject, Image
 
 
 class Yolo:
 
     def __init__(self):
-        self.cap = None
-        # 1 if more webcams, 0 if only one cam
-        self.cap = cv2.VideoCapture(1)
-        self.cap.set(3, 1280)
-        self.cap.set(4, 720)
-
         current_directory = os.path.dirname(__file__)
         model_path = os.path.join(current_directory, 'YOLO_FINAL_MODEL.pt')
         self.model = YOLO(model_path)  # NEWEST model
-        # model.predict("Bane.jpg", save=True)
 
         self.className = ['cross', 'egg', 'goal', 'orange-ball', 'robot', 'robot-front', 'wall', 'white-ball']
-        self.robot = None
-        self.detected_objects = []
 
+    '''
     def add_detected_object(self, x1, y1, x2, y2, class_name):
         self.detected_objects.append({'x_min': x1, 'y_min': y1, 'x_max': x2, 'y_max': y2, 'type': class_name})
 
@@ -105,7 +98,6 @@ class Yolo:
         end_pos = Vector(x2, y2)
         return Egg(class_name, Box(start_pos, end_pos))
 
-    '''
     def run(self):
         current_directory = os.path.dirname(__file__)
         image_path = os.path.join(current_directory, 'BaneImage.jpg')
@@ -170,11 +162,10 @@ class Yolo:
             cv2.imwrite(output_image, img)
 
             #cv2.imshow('image', img)
-            cv2.waitKey(0)  # Wait for any key press
-            cv2.destroyAllWindows()
-    '''
+            #cv2.waitKey(0)  # Wait for any key press
+            #cv2.destroyAllWindows()
+            return img, self.detected_objects
 
-    '''
     def run(self):
         while True:
             success, img = self.cap.read()
@@ -250,76 +241,33 @@ class Yolo:
             self.cap.release()
     '''
 
-    def run(self):
-        #self.add_detected_object(20, 20, 10, 10, 'goal')
-        success, img = self.cap.read()
-        if not success:
-            print("Failed to capture image")
-            return None, None
+    def find_objects(self, image: Image) -> list:
+        detected_objects = list()
+        results = self.model(image.data, save=True)
 
-        result = self.model(img, stream=True)
-        self.detected_objects.clear()  #Remove the old detected objects
+        for result in results:
+            boxes = result.boxes
+            for yolo_box in boxes:
+                x1, y1, x2, y2 = yolo_box.xyxy[0]
+                top_left = Vector(x1, y1)
+                bottom_right = Vector(x2, y2)
 
-        for r in result:
-            boxes = r.boxes
-            for box in boxes:
-                x1, y1, x2, y2 = box.xyxy[0]
-                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-
-                w, h = x2 - x1, y2 - y1
-                bounded_box = int(x1), int(y1), int(w), int(h)
-                cvzone.cornerRect(img, bounded_box)
+                bounds = Box(top_left, bottom_right)
+                #cvzone.cornerRect(image.data, (bounds.x1, bounds.y1, bounds.width, bounds.height))
 
                 # Confidence level for detected object
-                confidence = math.ceil((box.conf[0] * 100)) / 100
+                confidence = math.ceil((yolo_box.conf[0] * 100)) / 100
 
-                object_detected = int(box.cls[0])
+                object_detected = int(yolo_box.cls[0])
                 current_class = self.className[object_detected]
 
+                obj = DetectedObject(current_class, bounds)
+                detected_objects.append(obj)
+
                 # Shows class name and confidence on screen
-                text = ""
-                if current_class == "orange-ball" or current_class == "white-ball":
-                    current_ball = self.detect_ball(current_class, x1, y1, x2, y2)
-                    text = f'{current_class} {confidence:.2f}% x={current_ball.position.x} y={current_ball.position.y}'
-                    cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
+                text = f'{obj.name} {confidence:.2f}% start={x1, y1} end={x2, y2}'
+                #cvzone.putTextRect(image.data, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
 
-                elif current_class == "wall":
-                    current_wall = self.detect_wall(current_class, x1, y1, x2, y2)
-                    text = f'{current_class} {confidence:.2f}% start={current_wall.x1, current_wall.y1} end={current_wall.x2, current_wall.y2}'
-                    cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-                    if current_wall.is_left_wall or current_wall.is_right_wall:
-                        goal = self.goal_on_wall('goal', current_wall)
-                        text = (
-                            f'{current_class} {confidence:.2f}% x= {(current_wall.x1 + current_wall.x2) / 2}, '
-                            f'y = {(current_wall.y1 + current_wall.y2) / 2}')
-                        cvzone.putTextRect(img, text, (max(0, (x1 + x2 // 2)), max(35, (y1 + x2) // 2)), scale=1,
-                                           thickness=1)
-
-                elif current_class == "robot-front":
-                    if self.robot is not None:
-                        direction = self.detect_robot_front(current_class, x1, y1, x2, y2)
-                        text = f'{current_class} {confidence:.2f}% angle={direction}'
-                        cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
-                elif current_class == "robot":
-                    robot = self.detect_robot(current_class, x1, y1, x2, y2)
-                    text = f'{current_class} {confidence:.2f}% start: ={x1:2f}%, {y1:2f}% end: ={x2:2f}%, {y2:2f}%'
-                    cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
-                elif current_class == "egg":
-                    egg = self.detect_egg(current_class, x1, y1, x2, y2)
-                    text = f'{current_class} {confidence:.2f}% start ={egg.position.x1, egg.position.y1} end={egg.position.x2, egg.position.y2}'
-                    cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
-                elif current_class == "cross":
-                    current_cross = self.detect_cross(current_class, x1, y1, x2, y2)
-                    text = f'{current_class} {confidence:.2f}% start={current_cross.position.x1, current_cross.position.y1} end={current_cross.position.x2, current_cross.position.y2}'
-                    cvzone.putTextRect(img, text, (max(0, x1), max(35, y1)), scale=1, thickness=1)
-
-            # Display the image
-        cv2.imshow("image", img)
-
-        #self.cap.release()
-        #cv2.destroyAllWindows()
-
-        return img, self.detected_objects
+        # Display the image
+        cv2.imshow("image", image.data)
+        return detected_objects

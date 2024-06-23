@@ -1,5 +1,5 @@
-from .Box import Box
-from .Vector import Vector
+from GolfBot.Server.Basics.Box import Box
+from GolfBot.Server.Basics.Vector import Vector
 
 
 class Wall(Box):
@@ -8,3 +8,7 @@ class Wall(Box):
         self.is_left_wall = False
         self.is_right_wall = False
         super().__init__(start_position, end_position)
+
+    @property
+    def is_goal_wall(self):
+        return self.is_left_wall or self.is_right_wall

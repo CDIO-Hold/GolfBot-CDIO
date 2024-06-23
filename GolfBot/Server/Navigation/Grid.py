@@ -32,12 +32,12 @@ class Grid:
             elif obj_type == "white-ball":
                 print("adding white-ball")
                 center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 2)
+                self.add_object(center_x, center_y, 7)
                 self.add_end_point(obj)
             elif obj_type == "orange-ball":
                 print("adding orange-ball")
                 center_x, center_y = self.get_center_coords(obj)
-                self.add_object(center_x, center_y, 3)
+                self.add_object(center_x, center_y, 6)
                 self.add_end_point(obj)
             elif obj_type == "wall":
                 print("adding wall")
