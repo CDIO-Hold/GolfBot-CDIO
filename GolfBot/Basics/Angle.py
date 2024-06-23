@@ -98,3 +98,38 @@ class Angle:
 
     def __int__(self):
         return int(self.value)
+
+
+class CardinalDirection:
+    @staticmethod
+    @property
+    def EAST():
+        return Angle(0, degrees)
+
+    @staticmethod
+    @property
+    def NORTH():
+        return Angle(90, degrees)
+
+    @staticmethod
+    @property
+    def WEST():
+        return Angle(180, degrees)
+
+    @staticmethod
+    @property
+    def SOUTH():
+        return Angle(270, degrees)
+
+    @staticmethod
+    def angle_to_cardinal(angle: Angle):
+        angle = angle.get_value(signed=True, unit=degrees)
+        if 45 <= angle < 135:
+            return CardinalDirection.NORTH
+        elif -45 <= angle < 45:
+            return CardinalDirection.EAST
+        elif angle >= 135 or angle < -135:
+            return CardinalDirection.WEST
+        else:
+            return CardinalDirection.SOUTH
+
