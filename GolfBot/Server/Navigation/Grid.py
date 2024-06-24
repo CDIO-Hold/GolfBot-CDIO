@@ -15,9 +15,9 @@ class Grid:
         self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
         return
 
-    def add_endpoint(self, box, ball_type, safe_zone=300):
+    def add_endpoint(self, center, ball_type, safe_zone=300):
             print("adding endpoint : " + ball_type)
-            center_x, center_y = box.get_center().as_tuple()
+            center_x, center_y = center.as_tuple()
             self.add_object(center_x, center_y, self.obj_type_to_int(ball_type))
 
             # if that endpoint has something close to it, create a staggered endpoint

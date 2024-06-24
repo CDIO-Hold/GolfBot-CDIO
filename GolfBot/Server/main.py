@@ -76,7 +76,7 @@ while True:
             ball_box = shapes[i]
             name = keyed_groups["ball"].objects[i].name
             grid.add_box(ball_box, name)
-            grid.add_endpoint()
+            grid.add_endpoint(ball_box.get_center(), name)
 
     if "robot" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["robot"])
