@@ -1,6 +1,6 @@
 
 from Robot import Robot
-from Basics import ConnectionInfo, DriveSpeed, Vector
+from GolfBot.Server.Basics import ConnectionInfo, DriveSpeed, Vector
 from socket import socket, AF_INET, SOCK_DGRAM
 
 localhost = "127.0.0.1"
