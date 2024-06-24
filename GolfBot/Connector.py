@@ -29,8 +29,8 @@ class Connector:
 
     def process_image(self, detected_objects):
         self.grid.add_detected_object(detected_objects)
-        #self.grid.add_detected_endpoint(detected_objects)
-        self.grid = self.grid.scaled_to(128, 72)
+        self.grid.add_detected_endpoint(detected_objects)
+        self.grid = self.grid.scaled_to(192, 108)
 
         print(self.grid)
         pathfinder = PathFinder(self.grid)
@@ -54,12 +54,12 @@ class Connector:
         end_position = None
         if len(self.grid.end_points) > 0: #should be 0
             self.grid.sorted_end_points(robot_position)
-            end_position = self.grid.end_points[1]['center'] #should be 0
+            end_position = self.grid.end_points[2]['center'] #should be 0
             print('Found the position:', end_position)
             path = pathfinder.find_path(robot_position, end_position)
-            print(self.grid.end_points)
-            print(path)
-            self.visualize_path(path, robot_position, end_position)
+            #print(self.grid.end_points)
+            #print(path)
+            #self.visualize_path(path, robot_position, end_position)
             self.send_data(path, 'goto')
         else:
             print('no endpoints')

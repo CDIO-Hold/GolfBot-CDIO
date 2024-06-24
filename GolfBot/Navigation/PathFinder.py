@@ -69,16 +69,16 @@ class PathFinder:
         for i in range(0, robot_size):
             for j in range(0, robot_size):
                 if not self.is_valid_position(neighbor_x + i, neighbor_y + j):
-                    print("will collide at: ", neighbor_x + i, neighbor_y + j)
+                    #print("will collide at: ", neighbor_x + i, neighbor_y + j)
                     collision = True
                 if not self.is_valid_position(neighbor_x + i, neighbor_y - j):
-                    print("will collide at: ", neighbor_x + i, neighbor_y - j)
+                    #print("will collide at: ", neighbor_x + i, neighbor_y - j)
                     collision = True
                 if not self.is_valid_position(neighbor_x - i, neighbor_y + j):
-                    print("will collide at: ", neighbor_x - i, neighbor_y + j)
+                    #print("will collide at: ", neighbor_x - i, neighbor_y + j)
                     collision = True
                 if not self.is_valid_position(neighbor_x - i, neighbor_y - j):
-                    print("will collide at: ", neighbor_x - i, neighbor_y - j)
+                    #print("will collide at: ", neighbor_x - i, neighbor_y - j)
                     collision = True
         return collision
 

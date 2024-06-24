@@ -18,13 +18,8 @@ class Grid:
             if obj_type == "orange-ball":
                 continue
             print("adding object : " + obj_type)
-            xmin = obj['x_min']
-            xmax = obj['x_max']
-            ymin = obj['y_min']
-            ymax = obj['y_max']
-            print("at" + str(xmin) + " " + str(ymin))
-            self.add_2d_object(xmin, xmax, ymin, ymax, self.obj_type_to_int(obj_type))
-    def add_detected_endpoint(self, detected_objects):
+            self.add_2d_object(obj['x_min'], obj['x_max'], obj['y_min'], obj['y_max'], self.obj_type_to_int(obj_type))
+    def add_detected_endpoint(self, detected_objects, safe_zone = 300):
         for obj in detected_objects:
             obj_type = obj['type']
             if obj_type == "wall":
@@ -38,30 +33,138 @@ class Grid:
             print("adding endpoint : " + obj_type)
             center_x, center_y = self.get_center_coords(obj)
             self.add_object(center_x, center_y, self.obj_type_to_int(obj_type))
+            print('at center: ' + str(center_x) + ', ' + str(center_y))
             self.add_end_point(obj)
 
-    def obj_type_to_int(self, obj_type):
-        if obj_type == "wall":
-            return 1
-        elif obj_type == "white-ball":
-            return 2
-        elif obj_type == "orange-ball":
-            return 3
-        elif obj_type == "robot":
-            return 4
-        elif obj_type == "goal":
-            return 8
-        elif obj_type == "cross":
-            return 1
-        elif obj_type == "egg":
-            return 1
-        else:
-            return 0
+            # if that endpoint has something close to it, create a staggered endpoint
+            #debugging
+            if center_x == 989 and center_y == 944:
+
+                distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
+                direction = next(iter(distance_and_direction))
+                distance = distance_and_direction[direction]
+                print("distance and direction to closest object: " + str(distance_and_direction))
+                if distance > safe_zone:
+                    print('endpoint: ' + str(obj['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
+                    self.add_staggered_end_point(obj)
+                else:
+                    print("creating staggered endpoint bases on the direction and distance to closest object")
+                    stagger_distance = safe_zone - distance
+                    staggered_end_point = self.stagger_end_point(obj, direction, stagger_distance)
+                    #compare staggered to the original endpoint
+                    print('original endpoint: ' + str(obj))
+                    print('vs staggered endpoint: ' + str(staggered_end_point))
+                    #find out which way we should stagger based on direction
+                    print('endpoint: ' + str(obj['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is not clear of objects in a radius of: ' + str(safe_zone))
+                    #offset the center of the staggered endpoint based on the direction and distance to the closest object
+                    #staggered_end_point = self.stagger_end_point(obj, distance_and_direction[1], distance_and_direction[0])
+                    # check if the staggered endpoint is within the bounds of the grid
+                    # check if the staggred endpint is not on top of another object
+                    # check if the staggered endpoint is not on top of another staggered endpoint
+                    # check if the staggered endpoint is in a safe zone
+                    # if all checks pass, add the staggered endpoin
+                    #self.add_staggered_end_point(staggered_end_point)
+                    #else offset the staggered endpoint in a different direction until it is within a safe zone
+                    #if all directions have been tried and the staggered endpoint is still not within a safe zone, do not add the staggered endpoint
+
+
+
+
+
+
+
+    #function that determines if something is close to a recently added endpoint
+    def direction_and_distance_to_closest_object(self, center_x, center_y, safe_zone_radius):
+        #movements in all directions based on safe_zone_radius
+        straight_up_movement = [(0, i) for i in range(1, safe_zone_radius + 1)]
+        straight_down_movement = [(0, -i) for i in range(1, safe_zone_radius + 1)]
+        straight_left_movement = [(-i, 0) for i in range(1, safe_zone_radius + 1)]
+        straight_right_movement = [(i, 0) for i in range(1, safe_zone_radius + 1)]
+        #diagonal_up_right = [(i, i) for i in range(1, safe_zone_radius + 1)]
+        #diagonal_up_left = [(-i, i) for i in range(1, safe_zone_radius + 1)]
+        #diagonal_down_right = [(i, -i) for i in range(1, safe_zone_radius + 1)]
+
+        straight_up = {"straight_up": safe_zone_radius + 1}
+        straight_down = {"straight_down": safe_zone_radius + 1}
+        straight_left = {"straight_left": safe_zone_radius + 1}
+        straight_right = {"straight_right": safe_zone_radius + 1}
+        #diagonal_up_right_distance = 0
+        #diagonal_up_left_distance = 0
+        #diagonal_down_right_distance = 0
+
+        # loop through all movements and add the length of the movement to the distance if there is an object in the way
+        for movement in straight_up_movement:
+            current_distance = abs(movement[1])
+            current_cell = (center_x, center_y - movement[1])
+            #print("checking straight up cell on grid: " + str(current_cell))
+            if not self.is_empty_space(current_cell[0], current_cell[1]):
+                print('found an obstacle above ' + str(current_distance) + ' away')
+                straight_up['straight_up'] = current_distance
+                break
+
+
+        for movement in straight_down_movement:
+            current_distance = abs(movement[1])
+            #print("current distance: " + str(current_distance))
+            current_cell = (center_x, int(center_y - movement[1])) # should maybe be current_cell = (center_x, center_y + movement[1])
+            #print("checking straight down cell on grid: " + str(current_cell))
+            if not self.is_empty_space(current_cell[0], current_cell[1]):
+                straight_down['straight_down'] = current_distance
+                break
+
+        for movement in straight_left_movement:
+            current_distance = abs(movement[0])
+            current_cell = (center_x + movement[0], center_y)
+            #print("checking straight left cell on grid: " + str(current_cell))
+            if not self.is_empty_space(current_cell[0], current_cell[1]):
+                print('found an obstacle to the left ' + str(current_distance) + ' away')
+                straight_left['straight_left'] = current_distance
+                break
+
+        for movement in straight_right_movement:
+            current_distance = abs(movement[0])
+            current_cell = (center_x + movement[0], center_y)
+            #print("checking straight right cell on grid: " + str(current_cell))
+            if not self.is_empty_space(current_cell[0], current_cell[1]):
+                print('found an obstacle to the right ' + str(current_distance) + ' away')
+                straight_right['straight_right'] = current_distance
+                break
+
+        #find the direction with the closest distance
+        dict_list = [straight_up, straight_down, straight_left, straight_right]
+        print('before sorting: ' + str(dict_list))
+        sorted_dicts = sorted(dict_list, key=lambda x: next(iter(x.values())))
+        print('after sorting: ' + str(sorted_dicts))
+        min_dict = sorted_dicts[0]
+        return min_dict
+
+    def stagger_end_point(self, obj, direction, distance):
+        x_min = obj['x_min']
+        x_max = obj['x_max']
+        y_min = obj['y_min']
+        y_max = obj['y_max']
+
+        if direction == "straight_up":
+            y_min = y_min + distance
+            y_max = y_max + distance
+        elif direction == "straight_down":
+            y_min = y_min - distance
+            y_max = y_max - distance
+        elif direction == "straight_left":
+            x_min = x_min + distance
+            x_max = x_max + distance
+        elif direction == "straight_right":
+            x_min = x_min - distance
+            x_max = x_max - distance
+
+        return {'x_min': x_min, 'y_min': y_min, 'x_max': x_max, 'y_max': y_max, 'type': obj['type']}
+
     def add_object(self, x, y, obj_type):
         x = int(x)
         y = int(y)
         if self.cell_withing_bounds(x, y):
             self.grid[y][x] = obj_type
+
 
 
     def add_2d_object(self, xmin, xmax, ymin, ymax, obj_type):
@@ -73,6 +176,10 @@ class Grid:
     def add_end_point(self, end_point):
         end_point_obj = {'center': self.get_center_coords(end_point), 'type': end_point['type']}
         self.end_points.append(end_point_obj)
+
+    def add_staggered_end_point(self, end_point):
+        end_point_obj = {'center': self.get_center_coords(end_point), 'type': end_point['type']}
+        self.staggered_end_points.append(end_point_obj)
 
 
     def sorted_end_points(self, current_position):
@@ -143,6 +250,33 @@ class Grid:
 
     def cell_withing_bounds(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
+
+    def is_empty_space(self, x, y):
+        within = self.cell_withing_bounds(x, y)
+        if not within:
+            return False
+        #print("checking if empty space at: " + str(x) + ", " + str(y) + " with value: " + str(self.grid[y][x]))
+        if self.grid[y][x] == 1:
+            return False
+        return True
+    def obj_type_to_int(self, obj_type):
+        if obj_type == "wall":
+            return 1
+        elif obj_type == "white-ball":
+            return 2
+        elif obj_type == "orange-ball":
+            return 3
+        elif obj_type == "robot":
+            return 4
+        elif obj_type == "goal":
+            return 8
+        elif obj_type == "cross":
+            return 1
+        elif obj_type == "egg":
+            return 1
+        else:
+            return 0
+
 
     def __getitem__(self, item):
         x, y = item
