@@ -18,7 +18,7 @@ class Yolo:
 
     def find_objects(self, image: Image) -> list:
         detected_objects = list()
-        results = self.model(image.data, save=True)
+        results = self.model(image.data, stream=True)
 
         for result in results:
             boxes = result.boxes
@@ -54,6 +54,7 @@ class Yolo:
 
         # Display the image
         cv2.imshow("image", image.data)
+        cv2.imwrite("Current.png", image.data)
 
         # Get just the values in a list
         return [groups[key] for key in groups]
