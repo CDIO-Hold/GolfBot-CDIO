@@ -24,6 +24,8 @@ class Yolo:
             boxes = result.boxes
             for yolo_box in boxes:
                 x1, y1, x2, y2 = yolo_box.xyxy[0]
+                x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
+
                 top_left = Vector(x1, y1)
                 bottom_right = Vector(x2, y2)
 
