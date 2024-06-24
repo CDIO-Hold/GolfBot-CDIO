@@ -15,7 +15,7 @@ class Grid:
         self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
         return
 
-    def add_detected_endpoint(self, box, ball_type, safe_zone=300):
+    def add_endpoint(self, box, ball_type, safe_zone=300):
             print("adding endpoint : " + ball_type)
             center_x, center_y = box.get_center().as_tuple()
             self.add_object(center_x, center_y, self.obj_type_to_int(ball_type))
@@ -32,14 +32,12 @@ class Grid:
                     'type': ball_type
                 }
                 self.add_end_point(end_point)
-                print('helo')
-                #print('endpoint: ' + str(end_point['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
-                #self.add_staggered_end_point(obj)
             else:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
-                #staggered_end_point = self.stagger_end_point(end_point, direction, stagger_distance)
-                #self.add_staggered_end_point(end_point, staggered_end_point)
+                staggered_end_point = self.stagger_end_point(center_x, center_y, ball_type, direction, stagger_distance)
+                self.add_end_point(staggered_end_point)
+            return
 
     #function that determines if something is close to a recently added endpoint
     def direction_and_distance_to_closest_object(self, center_x, center_y, safe_zone_radius):
@@ -106,26 +104,21 @@ class Grid:
         min_dict = sorted_dicts[0]
         return min_dict
 
-    def stagger_end_point(self, obj, direction, distance):
-        x_min = obj['x_min']
-        x_max = obj['x_max']
-        y_min = obj['y_min']
-        y_max = obj['y_max']
-
+    def stagger_end_point(self, center_x, center_y, type, direction, distance):
         if direction == "straight_up":
-            y_min = y_min + distance
-            y_max = y_max + distance
+            staggered_center_y = center_y + distance
         elif direction == "straight_down":
-            y_min = y_min - distance
-            y_max = y_max - distance
+            staggered_center_y = center_y - distance
         elif direction == "straight_left":
-            x_min = x_min + distance
-            x_max = x_max + distance
+            staggered_center_x = center_x + distance
         elif direction == "straight_right":
-            x_min = x_min - distance
-            x_max = x_max - distance
+            staggered_center_x = center_x - distance
 
-        return {'x_min': x_min, 'y_min': y_min, 'x_max': x_max, 'y_max': y_max, 'type': obj['type']}
+        return  {
+                'center': (center_x, center_y),
+                'staggered': (staggered_center_x, staggered_center_y),
+                'type': type
+                }
 
     def add_object(self, x, y, obj_type):
         x = int(x)
@@ -142,13 +135,8 @@ class Grid:
                 if self.cell_withing_bounds(i, j):
                     self.add_object(i, j, obj_type)
     def add_end_point(self, end_point):
-        end_point_obj = {'center': self.get_center_coords(end_point), 'staggered': None, 'type': end_point['type']}
-        self.end_points.append(end_point_obj)
-
-    def add_staggered_end_point(self, end_point, staggered_point):
-        end_point_obj = {'center': self.get_center_coords(end_point), 'staggered': self.get_center_coords(staggered_point), 'type': end_point['type']}
-        self.end_points.append(end_point_obj)
-
+        self.end_points.append(end_point)
+        return
 
     def sorted_end_points(self, current_position):
         # Initialize lists to store white balls, orange balls, and goals
