@@ -4,7 +4,7 @@ import cv2
 
 from GolfBot.Server.Navigation import Grid
 from GolfBot.Server.Navigation.PathFinder import PathFinder
-from GolfBot.Server.ImageRecognition import Yolo
+from YOLO import Yolo
 import time
 
 

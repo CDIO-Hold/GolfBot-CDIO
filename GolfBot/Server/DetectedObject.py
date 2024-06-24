@@ -1,4 +1,10 @@
-from GolfBot.Server.ImageRecognition import DetectedObject
+from Shapes import Box
+
+
+class DetectedObject:
+    def __init__(self, name: str, bounding_box: Box):
+        self.name = name
+        self.bounding = bounding_box
 
 
 class DetectedGroup:
@@ -9,7 +15,7 @@ class DetectedGroup:
     def add(self, obj: DetectedObject):
         self.objects.append(obj)
 
-    def get_by_name(self, object_name: str) -> (DetectedObject | None):
+    def get_by_name(self, object_name: str):
         for obj in self.objects:
             if obj.name == object_name:
                 return obj

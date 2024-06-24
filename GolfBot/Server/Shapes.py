@@ -1,5 +1,6 @@
 import math
-from GolfBot.Server.Basics import Vector, Angle
+from Vector import Vector
+from Angle import Angle
 
 
 class Shape:
@@ -43,6 +44,9 @@ class Box(Shape):
     def get_center(self):
         return Vector((self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2)
 
+    def __str__(self):
+        return f"Box({self.top_left}; {self.bottom_right})"
+
 
 class Circle(Shape):
     def __init__(self, center: Vector, **kwargs):
@@ -83,8 +87,15 @@ class MultiShape(Shape):
 
         return center_sum * (1 / len(self.shapes))
 
+    def __str__(self):
+        string_shapes = [str(shape) for shape in self.shapes]
+        return f"Multi({'; '.join(string_shapes)})"
+
 
 class AngledShape:
     def __init__(self, shape: Shape, angle: Angle):
         self.shape = shape
         self.angle = angle
+
+    def __str__(self):
+        return f"Angled({self.shape}; {self.angle})"

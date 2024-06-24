@@ -1,5 +1,6 @@
-from GolfBot.Server.Basics import Vector, Shape, Box, AngledShape, MultiShape
-from GolfBot.Server.ImageRecognition import DetectedGroup, DetectedObject
+from Vector import Vector
+from Shapes import Shape, Box, MultiShape, AngledShape
+from DetectedObject import DetectedObject, DetectedGroup
 
 
 def detected_group_to_shapes(group: DetectedGroup) -> list[Shape | AngledShape]:
@@ -43,5 +44,5 @@ def detected_group_to_shapes(group: DetectedGroup) -> list[Shape | AngledShape]:
         pass  # Goals?
 
     for obj in group.objects:
-        shapes.append(obj)
+        shapes.append(obj.bounding)
     return shapes

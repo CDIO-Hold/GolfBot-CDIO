@@ -2,9 +2,12 @@ import math
 from ultralytics import YOLO
 import cv2
 import cvzone
-from GolfBot.Server.Basics import Vector, Box, CardinalDirection, AngleMath
+from Vector import Vector
+from Shapes import Box
+from Angle import CardinalDirection, AngleMath
 import os
-from GolfBot.Server.ImageRecognition import DetectedObject, DetectedGroup, Image
+from DetectedObject import DetectedObject, DetectedGroup
+from Camera import Image
 
 
 class Yolo:

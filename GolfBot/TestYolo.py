@@ -15,7 +15,7 @@ class TestYolo(unittest.TestCase):
         self.mock_video_capture.read.return_value = (True, MagicMock())
 
         self.yolo = Yolo()
-        self.yolo.model = YOLO('Server/ImageRecognition/YOLO_FINAL_MODEL.pt')
+        self.yolo.model = YOLO('Server/YOLO_FINAL_MODEL.pt')
         self.robot = self.yolo.robot
 
     def test_detect_ball(self):

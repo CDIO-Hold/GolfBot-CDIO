@@ -1,4 +1,4 @@
-from GolfBot.Server.Connector import Connector
+from Connector import Connector
 from YOLO import Yolo
 from GolfBot.Server.Navigation.Grid import Grid
 
