@@ -59,11 +59,11 @@ while True:
         robot.collector.start_loading()
     elif action == "shoot":
         robot.collector.start_unloading()
-    elif action.startswith("update_robot_pos"):
-        target = action.split(" ")[1]
-        x, y = target.split(",")
-        target = Vector(int(x), int(y))
-        robot.set_position(target)
+    elif action.startswith("robot"):
+        _, position, angle = action.split(" ")
+        x, y = position.split(",")
+        robot.set_position(Vector(float(x), float(y)))
+        robot.set_rotation(float(angle))
     elif action == "stop":
         robot.collector.stop()
 
