@@ -90,10 +90,11 @@ class PathFinder:
         else: #first go to staggered position then end goal
             full_path = self.astar(start, staggered)
             print('path to staggered: ', full_path)
-            full_path.append(end_goal)
             print('path to goal from: ', full_path)
-        #full_path = self.identify_corners(full_path)
+        print('path before' + str(full_path))
+        full_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
+        full_path.append(end_goal)
         return full_path
 
     def identify_corners(self, path):

@@ -15,9 +15,9 @@ class Grid:
         self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
         return
 
-    def add_endpoint(self, center, ball_type, safe_zone=300):
+    def add_endpoint(self, center, ball_type, safe_zone=100):
             print("adding endpoint : " + ball_type)
-            center_x, center_y = center.as_tuple()
+            center_x, center_y = (int (n) for n in center.as_tuple())
             self.add_object(center_x, center_y, self.obj_type_to_int(ball_type))
 
             # if that endpoint has something close to it, create a staggered endpoint
@@ -36,7 +36,7 @@ class Grid:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
                 staggered_end_point = self.stagger_end_point(center_x, center_y, ball_type, direction, stagger_distance)
-                self.add_end_point(staggered_end_point)
+                #self.add_end_point(staggered_end_point)
             return
 
     #function that determines if something is close to a recently added endpoint
@@ -105,20 +105,27 @@ class Grid:
         return min_dict
 
     def stagger_end_point(self, center_x, center_y, type, direction, distance):
+        staggered_center_y = 2
+        staggered_center_x = 2
         if direction == "straight_up":
             staggered_center_y = center_y + distance
+            staggered_center_x = center_x
         elif direction == "straight_down":
             staggered_center_y = center_y - distance
+            staggered_center_x = center_x
         elif direction == "straight_left":
             staggered_center_x = center_x + distance
+            staggered_center_y = center_y
         elif direction == "straight_right":
             staggered_center_x = center_x - distance
+            staggered_center_y = center_y
 
-        return  {
+        return {
                 'center': (center_x, center_y),
                 'staggered': (staggered_center_x, staggered_center_y),
                 'type': type
                 }
+
 
     def add_object(self, x, y, obj_type):
         x = int(x)

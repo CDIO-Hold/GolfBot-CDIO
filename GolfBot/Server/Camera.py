@@ -1,4 +1,5 @@
 from cv2 import VideoCapture
+from socket import socket, AF_INET, SOCK_DGRAM
 
 
 class Image:

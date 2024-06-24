@@ -2,12 +2,13 @@ from Camera import Camera
 from GolfBot.Server.Navigation import Grid, PathFinder
 from YOLO import Yolo
 from RobotClient import RobotClient, ScreenToWorld
+from Vector import Vector
 from Angle import degrees
 from DetectedToModel import detected_group_to_shapes
 
 
 print("Starting camera...")
-camera = Camera()
+camera = Camera(0)
 print("Initializing YOLO...")
 yolo = Yolo()
 print("Figuring out the scale")
@@ -45,6 +46,7 @@ robot.connect("127.0.0.1", 8000)
 while True:
     print("Finding objects...")
     picture = camera.take_picture()
+
 
     if picture.data is None:
         print("Error while taking the picture. Trying again...")
@@ -85,15 +87,24 @@ while True:
             robot_box = robot_shape.shape
             robot_angle = robot_shape.angle
 
-            # robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
+            print("Updating robot position")
+            robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
             grid.add_box(robot_box, "robot")
     print(grid.end_points)
     pathfinder = PathFinder(grid)
 
     robot_info = robot.get_info()
     position = robot_info.split(" ")[0]
-    x, y = (int(p) for p in position)
-    grid = grid.scaled_to(picture.width//10, picture.height//10)
-    pathfinder.find_path((x, y), grid.end_points[0])
+    x, y = (int(p.split(".")[0]) for p in position.split(","))
+    #grid = grid.scaled_to(picture.width//10, picture.height//10)
+    if len(grid.end_points) > 0:
+        path = pathfinder.find_path ((x, y), grid.end_points[0])
+    else:
+        path = []
+        print('mangler at gøre noget')
+    robot.collect()
+    for position in path:
+        x, y = position
+        robot.move_to(Vector(x, y))
 
-    break
+    # break
