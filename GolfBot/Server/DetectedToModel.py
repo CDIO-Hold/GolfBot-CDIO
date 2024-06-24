@@ -31,14 +31,6 @@ def detected_group_to_shapes(group: DetectedGroup) -> list[Shape | AngledShape]:
         robot_shape = AngledShape(robot_bounds, robot_vector.angle)
         return [robot_shape]
 
-    if group.name == "cross":
-        if len(group) != 2:
-            # The cross should always have exactly 2 parts
-            return []
-
-        cross_shape = MultiShape(group[0], group[1])
-        return [cross_shape]
-
     shapes = list()
     if group.name == "wall":
         pass  # Goals?

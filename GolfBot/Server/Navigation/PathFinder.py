@@ -92,7 +92,7 @@ class PathFinder:
             print('path to staggered: ', full_path)
             full_path.append(end_goal)
             print('path to goal from: ', full_path)
-        #corner_path = self.identify_corners(full_path)
+        #full_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
         return full_path
 

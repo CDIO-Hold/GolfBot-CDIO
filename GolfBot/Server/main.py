@@ -1,5 +1,5 @@
 from Camera import Camera
-from GolfBot.Server.Navigation import Grid
+from GolfBot.Server.Navigation import Grid, PathFinder
 from YOLO import Yolo
 from RobotClient import RobotClient, ScreenToWorld
 from Angle import degrees
@@ -51,13 +51,32 @@ while True:
         continue
 
     groups = yolo.find_objects(picture)
-
     keyed_groups = dict()
     for group in groups:
         keyed_groups[group.name] = group
 
     # initialize grid
-    # grid = Grid(picture.width, picture.height)
+    grid = Grid(picture.width, picture.height)
+    if "wall" in keyed_groups:
+        for wall_box in detected_group_to_shapes(keyed_groups["wall"]):
+            grid.add_box(wall_box, "wall")
+
+    if "cross" in keyed_groups:
+        for cross_box in detected_group_to_shapes(keyed_groups["cross"]):
+            grid.add_box(cross_box, "wall")
+
+    if "egg" in keyed_groups:
+        for egg_box in detected_group_to_shapes(keyed_groups["egg"]):
+            grid.add_box(egg_box, "egg")
+
+    if "ball" in keyed_groups:
+        shapes = detected_group_to_shapes(keyed_groups["ball"])
+
+        for i in range(len(shapes)):
+            ball_box = shapes[i]
+            name = keyed_groups["ball"].objects[i].name
+            grid.add_box(ball_box, name)
+            grid.add_detected_endpoint()
 
     if "robot" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["robot"])
@@ -66,33 +85,14 @@ while True:
             robot_box = robot_shape.shape
             robot_angle = robot_shape.angle
 
-            robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
+            # robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
+            grid.add_box(robot_box, "robot")
 
+    pathfinder = PathFinder(grid)
 
-    if "wall" in keyed_groups:
-        pass
-
-    if "cross" in keyed_groups:
-        shapes = detected_group_to_shapes(keyed_groups["cross"])
-        if len(shapes) == 2:
-            cross_shape = shapes[0]
-
-            cross_box = cross_shape.shape
-
-
-
-    if "egg" in keyed_groups:
-        pass
-
-    balls = [] if "ball" not in keyed_groups else detected_group_to_shapes(keyed_groups["ball"])
-
-    if len(balls) > 0:
-        print("found a target")
-        target = balls[0]
-        print("started collect...")
-        robot.collect()
-        print("sending coords")
-        robot.move_to(target.get_center())
-        print("coords sent: " + str(target.get_center()))
-
-    print(f"Robot: {robot.get_info()}")
+    # robot_info = robot.get_info()
+    # position = robot_info.split(" ")[0]
+    # x, y = (float(p) for p in position)
+    grid = grid.scaled_to(picture.width//10, picture.height//10)
+    print(grid)
+    break

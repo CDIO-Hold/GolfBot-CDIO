@@ -13,7 +13,7 @@ sock = socket(AF_INET, SOCK_DGRAM)
 sock.bind((localhost, port))
 
 # Make the connection to the robot through rpyc
-robot_ip = "192.168.116.17"
+robot_ip = "192.168.124.17"
 robot_port = 18812
 robot_connection = rpyc.classic.connect(robot_ip, robot_port)
 ev3_motors = robot_connection.modules['ev3dev2.motor']

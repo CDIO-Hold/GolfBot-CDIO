@@ -45,8 +45,8 @@ class Yolo:
                 detected_objects.append(obj)
 
                 # Shows class name and confidence on screen
-                text = f'name: {current_class} start:({int(bounds.x1)}, {int(bounds.y1)}) end=({int(bounds.x2)}, {int(bounds.y2)}) conf:{confidence:.2f}%'
-                cvzone.putTextRect(image.data, text, (int(max(0, x1)), int(max(35, y1))), scale=1, thickness=1)
+                #text = f'name: {current_class} start:({int(bounds.x1)}, {int(bounds.y1)}) end=({int(bounds.x2)}, {int(bounds.y2)}) conf:{confidence:.2f}%'
+                cvzone.putTextRect(image.data, current_class, (int(max(0, x1)), int(max(35, y1))), scale=1, thickness=1)
 
         group_names = ["ball", "wall", "robot", "cross", "egg"]
         groups = {name: DetectedGroup(name) for name in group_names}

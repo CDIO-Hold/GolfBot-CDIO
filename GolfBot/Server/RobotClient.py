@@ -2,7 +2,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 from Vector import Vector
 from Camera import Camera
 from Shapes import Box
-
+from Angle import Angle
 
 class ScreenToWorld:
     def __init__(self, camera: Camera, scale: float = 1.0):

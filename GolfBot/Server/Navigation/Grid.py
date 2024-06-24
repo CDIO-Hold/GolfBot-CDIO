@@ -9,32 +9,16 @@ class Grid:
         self.grid = [[0 for _ in range(width)] for _ in range(height)]
         self.end_points = []
 
-    def add_detected_object(self, detected_objects):
-        for obj in detected_objects:
-            obj_type = obj['type']
-            if obj_type == "white-ball":
-                continue
-            if obj_type == "orange-ball":
-                continue
-            print("adding object : " + obj_type)
-            self.add_2d_object(obj['x_min'], obj['x_max'], obj['y_min'], obj['y_max'], self.obj_type_to_int(obj_type))
+    def add_box(self, box, object_type: str):
+        print(f"Adding {object_type}")
+        number = self.obj_type_to_int(object_type)
+        self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
+        return
 
-    def add_detected_endpoint(self, detected_objects, safe_zone=300):
-        for end_point in detected_objects:
-            obj_type = end_point['type']
-            if obj_type == "wall":
-                continue
-            if obj_type == "egg":
-                continue
-            if obj_type == "cross":
-                continue
-            if obj_type == "robot":
-                continue
-            if obj_type == "goal":
-                continue
-            print("adding endpoint : " + obj_type)
-            center_x, center_y = self.get_center_coords(end_point)
-            self.add_object(center_x, center_y, self.obj_type_to_int(obj_type))
+    def add_detected_endpoint(self, box, ball_type, safe_zone=300):
+            print("adding endpoint : " + ball_type)
+            center_x, center_y = box.get_center().as_tuple()
+            self.add_object(center_x, center_y, self.obj_type_to_int(ball_type))
 
             # if that endpoint has something close to it, create a staggered endpoint
             distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
@@ -42,6 +26,11 @@ class Grid:
             distance = distance_and_direction[direction]
             print("distance and direction to closest object: " + str(distance_and_direction))
             if distance > safe_zone:
+                end_point = {
+                    'center': (center_x, center_y),
+                    'staggered': None,
+                    'type': ball_type
+                }
                 self.add_end_point(end_point)
                 print('helo')
                 #print('endpoint: ' + str(end_point['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
@@ -49,8 +38,8 @@ class Grid:
             else:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
-                staggered_end_point = self.stagger_end_point(end_point, direction, stagger_distance)
-                self.add_staggered_end_point(end_point, staggered_end_point)
+                #staggered_end_point = self.stagger_end_point(end_point, direction, stagger_distance)
+                #self.add_staggered_end_point(end_point, staggered_end_point)
 
     #function that determines if something is close to a recently added endpoint
     def direction_and_distance_to_closest_object(self, center_x, center_y, safe_zone_radius):
