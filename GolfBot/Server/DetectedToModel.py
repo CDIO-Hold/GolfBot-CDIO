@@ -1,5 +1,5 @@
 from Vector import Vector
-from Shapes import Shape, Box, MultiShape, AngledShape
+from Shapes import Shape, Box, MultiShape, AngledShape, Circle
 from DetectedObject import DetectedObject, DetectedGroup
 
 

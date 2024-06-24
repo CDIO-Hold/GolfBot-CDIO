@@ -18,7 +18,7 @@ class Robot:
         self.facing = 0
 
     def set_rotation(self, angle: float):
-        self.facing = angle
+        self.facing = angle % 360
 
     def set_position(self, position):
         self.position = position
@@ -34,7 +34,7 @@ class Robot:
 
     def drive_to(self, target: Vector):
         drive_vector = Vector.from_points(self.position, target)
-        # print("Drive vector:", drive_vector, drive_vector.angle.with_unit(degrees))
+        print("Drive vector: {} ({} degrees)".format(drive_vector, drive_vector.angle))
 
         if drive_vector.length == 0:
             print("Skipping driving")
