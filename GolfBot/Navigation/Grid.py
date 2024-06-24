@@ -8,6 +8,7 @@ class Grid:
         self.height = height
         self.grid = [[0 for _ in range(width)] for _ in range(height)]
         self.end_points = []
+
     def add_detected_object(self, detected_objects):
         for obj in detected_objects:
             obj_type = obj['type']
@@ -17,7 +18,8 @@ class Grid:
                 continue
             print("adding object : " + obj_type)
             self.add_2d_object(obj['x_min'], obj['x_max'], obj['y_min'], obj['y_max'], self.obj_type_to_int(obj_type))
-    def add_detected_endpoint(self, detected_objects, safe_zone = 300):
+
+    def add_detected_endpoint(self, detected_objects, safe_zone=300):
         for end_point in detected_objects:
             obj_type = end_point['type']
             if obj_type == "wall":
@@ -33,8 +35,6 @@ class Grid:
             print("adding endpoint : " + obj_type)
             center_x, center_y = self.get_center_coords(end_point)
             self.add_object(center_x, center_y, self.obj_type_to_int(obj_type))
-            print('at center: ' + str(center_x) + ', ' + str(center_y))
-            self.add_end_point(end_point)
 
             # if that endpoint has something close to it, create a staggered endpoint
             distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
@@ -42,10 +42,12 @@ class Grid:
             distance = distance_and_direction[direction]
             print("distance and direction to closest object: " + str(distance_and_direction))
             if distance > safe_zone:
-                print('endpoint: ' + str(end_point['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
+                self.add_end_point(end_point)
+                print('helo')
+                #print('endpoint: ' + str(end_point['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
                 #self.add_staggered_end_point(obj)
             else:
-                print("creating staggered endpoint bases on the direction and distance to closest object")
+                #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
                 staggered_end_point = self.stagger_end_point(end_point, direction, stagger_distance)
                 self.add_staggered_end_point(end_point, staggered_end_point)
@@ -109,9 +111,9 @@ class Grid:
 
         #find the direction with the closest distance
         dict_list = [straight_up, straight_down, straight_left, straight_right]
-        print('before sorting: ' + str(dict_list))
+        #print('before sorting: ' + str(dict_list))
         sorted_dicts = sorted(dict_list, key=lambda x: next(iter(x.values())))
-        print('after sorting: ' + str(sorted_dicts))
+        #print('after sorting: ' + str(sorted_dicts))
         min_dict = sorted_dicts[0]
         return min_dict
 
@@ -233,7 +235,7 @@ class Grid:
                 'staggered': (point['staggered'][0] // block_width, point['staggered'][1] // block_height),
                 'type': point['type']
                 }
-            scaled_points.append(scaled_point)
+                scaled_points.append(scaled_point)
         return scaled_points
     def cell_withing_bounds(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height

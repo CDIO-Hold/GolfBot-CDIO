@@ -82,8 +82,16 @@ class PathFinder:
                     collision = True
         return collision
 
-    def find_path(self, start, goal):
-        full_path = self.astar(start, goal)
+    def find_path(self, start, end_position):
+        staggered = end_position['staggered']
+        end_goal = end_position['center']
+        if staggered is None: #go straight to end goal
+            full_path = self.astar(start, end_goal)
+        else: #first go to staggered position then end goal
+            full_path = self.astar(start, staggered)
+            print('path to staggered: ', full_path)
+            full_path.append(end_goal)
+            print('path to goal from: ', full_path)
         #corner_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)
         return full_path

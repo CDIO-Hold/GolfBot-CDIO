@@ -53,15 +53,15 @@ class Connector:
         else:
             robot_position = (3, 3)
 
-        end_position = None
         if len(self.grid.end_points) > 0: #should be 0
             self.grid.sorted_end_points(robot_position)
-            end_position = self.grid.end_points[2]['center'] #should be 0
+            print(self.grid.end_points)
+            end_position = self.grid.end_points[5] #should be 0
             print('Found the position:', end_position)
             path = pathfinder.find_path(robot_position, end_position)
             #print(self.grid.end_points)
             #print(path)
-            #self.visualize_path(path, robot_position, end_position)
+            self.visualize_path(path, robot_position, end_position['center'])
             self.send_data(path, 'goto')
         else:
             print('no endpoints')
