@@ -15,10 +15,10 @@ class Grid:
         self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
         return
 
-    def add_endpoint(self, center, ball_type, safe_zone=100):
-            print("adding endpoint : " + ball_type)
+    def add_endpoint(self, center, endpoint_type: str, safe_zone=100):
+            print("adding endpoint : " + endpoint_type)
             center_x, center_y = (int (n) for n in center.as_tuple())
-            self.add_object(center_x, center_y, self.obj_type_to_int(ball_type))
+            self.add_object(center_x, center_y, self.obj_type_to_int(endpoint_type))
 
             # if that endpoint has something close to it, create a staggered endpoint
             distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
@@ -29,13 +29,13 @@ class Grid:
                 end_point = {
                     'center': (center_x, center_y),
                     'staggered': None,
-                    'type': ball_type
+                    'type': endpoint_type
                 }
                 self.add_end_point(end_point)
             else:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
-                staggered_end_point = self.stagger_end_point(center_x, center_y, ball_type, direction, stagger_distance)
+                staggered_end_point = self.stagger_end_point(center_x, center_y, endpoint_type, direction, stagger_distance)
                 #self.add_end_point(staggered_end_point)
             return
 

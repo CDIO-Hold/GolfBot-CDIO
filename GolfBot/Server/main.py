@@ -4,6 +4,7 @@ from YOLO import Yolo
 from RobotClient import RobotClient, ScreenToWorld
 from Vector import Vector
 from Angle import degrees
+from Shapes import Box
 from DetectedToModel import detected_group_to_shapes
 
 
@@ -60,8 +61,24 @@ while True:
     # initialize grid
     grid = Grid(picture.width, picture.height)
     if "wall" in keyed_groups:
+        walls = []
         for wall_box in detected_group_to_shapes(keyed_groups["wall"]):
             grid.add_box(wall_box, "wall")
+            walls.append(wall_box)
+        left_and_right = sorted(walls, key=lambda box: box.width)[:2]
+
+        left, right = sorted(left_and_right, key=lambda box: box.get_center().x)
+
+        # Add the goals
+        left_goal_width = 200 * scale
+        left_center = left.get_center()
+        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2)))
+        grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
+
+        right_goal_width = 80 * scale
+        right_center = right.get_center()
+        right_goal = Box(Vector(right.x1, right_center.y - (right_goal_width // 2)), Vector(right.x2, right_center.y + (right_goal_width // 2)))
+        # grid.add_endpoint(right_goal.get_center(), "goal", safe_zone=0)
 
     if "cross" in keyed_groups:
         for cross_box in detected_group_to_shapes(keyed_groups["cross"]):
@@ -99,6 +116,7 @@ while True:
     #grid = grid.scaled_to(picture.width//10, picture.height//10)
     if len(grid.end_points) > 0:
         path = pathfinder.find_path ((x, y), grid.end_points[0])
+        type = grid.end_points[0]['type']
     else:
         path = []
         print('mangler at gøre noget')
