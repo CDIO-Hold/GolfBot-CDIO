@@ -87,12 +87,13 @@ while True:
 
             # robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
             grid.add_box(robot_box, "robot")
-
+    print(grid.end_points)
     pathfinder = PathFinder(grid)
 
-    # robot_info = robot.get_info()
-    # position = robot_info.split(" ")[0]
-    # x, y = (float(p) for p in position)
+    robot_info = robot.get_info()
+    position = robot_info.split(" ")[0]
+    x, y = (int(p) for p in position)
     grid = grid.scaled_to(picture.width//10, picture.height//10)
-    print(grid)
+    pathfinder.find_path((x, y), grid.end_points[0])
+
     break
