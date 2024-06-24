@@ -2,6 +2,7 @@
 from .Camera import Camera, Image
 #from .Cross import Cross, HalfCross
 from .DetectedObject import DetectedObject
+from .DetectedGroup import DetectedGroup
 #from .Egg import Egg
 #from .Goal import Goal
 #from .Robot import RobotFront, RobotBack
