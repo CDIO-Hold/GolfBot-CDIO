@@ -3,6 +3,7 @@
 from .Angle import Angle, AngleUnit, degrees, radians, percent, CardinalDirection, AngleMath
 from .Shapes import Shape, Box, Circle, MultiShape, AngledShape
 from .ConnectionInfo import ConnectionInfo
+from .DetectedToModel import detected_group_to_shapes
 from .DistanceMath import DistanceMath
 from .DriveSpeed import DriveSpeed
 from .Vector import Vector
