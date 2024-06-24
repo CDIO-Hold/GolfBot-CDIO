@@ -8,8 +8,6 @@ class Grid:
         self.height = height
         self.grid = [[0 for _ in range(width)] for _ in range(height)]
         self.end_points = []
-        self.staggered_end_points = []
-
     def add_detected_object(self, detected_objects):
         for obj in detected_objects:
             obj_type = obj['type']
@@ -20,8 +18,8 @@ class Grid:
             print("adding object : " + obj_type)
             self.add_2d_object(obj['x_min'], obj['x_max'], obj['y_min'], obj['y_max'], self.obj_type_to_int(obj_type))
     def add_detected_endpoint(self, detected_objects, safe_zone = 300):
-        for obj in detected_objects:
-            obj_type = obj['type']
+        for end_point in detected_objects:
+            obj_type = end_point['type']
             if obj_type == "wall":
                 continue
             if obj_type == "egg":
@@ -30,48 +28,27 @@ class Grid:
                 continue
             if obj_type == "robot":
                 continue
+            if obj_type == "goal":
+                continue
             print("adding endpoint : " + obj_type)
-            center_x, center_y = self.get_center_coords(obj)
+            center_x, center_y = self.get_center_coords(end_point)
             self.add_object(center_x, center_y, self.obj_type_to_int(obj_type))
             print('at center: ' + str(center_x) + ', ' + str(center_y))
-            self.add_end_point(obj)
+            self.add_end_point(end_point)
 
             # if that endpoint has something close to it, create a staggered endpoint
-            #debugging
-            if center_x == 989 and center_y == 944:
-
-                distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
-                direction = next(iter(distance_and_direction))
-                distance = distance_and_direction[direction]
-                print("distance and direction to closest object: " + str(distance_and_direction))
-                if distance > safe_zone:
-                    print('endpoint: ' + str(obj['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
-                    self.add_staggered_end_point(obj)
-                else:
-                    print("creating staggered endpoint bases on the direction and distance to closest object")
-                    stagger_distance = safe_zone - distance
-                    staggered_end_point = self.stagger_end_point(obj, direction, stagger_distance)
-                    #compare staggered to the original endpoint
-                    print('original endpoint: ' + str(obj))
-                    print('vs staggered endpoint: ' + str(staggered_end_point))
-                    #find out which way we should stagger based on direction
-                    print('endpoint: ' + str(obj['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is not clear of objects in a radius of: ' + str(safe_zone))
-                    #offset the center of the staggered endpoint based on the direction and distance to the closest object
-                    #staggered_end_point = self.stagger_end_point(obj, distance_and_direction[1], distance_and_direction[0])
-                    # check if the staggered endpoint is within the bounds of the grid
-                    # check if the staggred endpint is not on top of another object
-                    # check if the staggered endpoint is not on top of another staggered endpoint
-                    # check if the staggered endpoint is in a safe zone
-                    # if all checks pass, add the staggered endpoin
-                    #self.add_staggered_end_point(staggered_end_point)
-                    #else offset the staggered endpoint in a different direction until it is within a safe zone
-                    #if all directions have been tried and the staggered endpoint is still not within a safe zone, do not add the staggered endpoint
-
-
-
-
-
-
+            distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
+            direction = next(iter(distance_and_direction))
+            distance = distance_and_direction[direction]
+            print("distance and direction to closest object: " + str(distance_and_direction))
+            if distance > safe_zone:
+                print('endpoint: ' + str(end_point['type']) + 'coords: ' + str(center_x) + ',  ' + str(center_y) + ' is clear of objects in a radius of: ' + str(safe_zone))
+                #self.add_staggered_end_point(obj)
+            else:
+                print("creating staggered endpoint bases on the direction and distance to closest object")
+                stagger_distance = safe_zone - distance
+                staggered_end_point = self.stagger_end_point(end_point, direction, stagger_distance)
+                self.add_staggered_end_point(end_point, staggered_end_point)
 
     #function that determines if something is close to a recently added endpoint
     def direction_and_distance_to_closest_object(self, center_x, center_y, safe_zone_radius):
@@ -174,12 +151,12 @@ class Grid:
                 if self.cell_withing_bounds(i, j):
                     self.add_object(i, j, obj_type)
     def add_end_point(self, end_point):
-        end_point_obj = {'center': self.get_center_coords(end_point), 'type': end_point['type']}
+        end_point_obj = {'center': self.get_center_coords(end_point), 'staggered': None, 'type': end_point['type']}
         self.end_points.append(end_point_obj)
 
-    def add_staggered_end_point(self, end_point):
-        end_point_obj = {'center': self.get_center_coords(end_point), 'type': end_point['type']}
-        self.staggered_end_points.append(end_point_obj)
+    def add_staggered_end_point(self, end_point, staggered_point):
+        end_point_obj = {'center': self.get_center_coords(end_point), 'staggered': self.get_center_coords(staggered_point), 'type': end_point['type']}
+        self.end_points.append(end_point_obj)
 
 
     def sorted_end_points(self, current_position):
@@ -218,16 +195,8 @@ class Grid:
         block_width = self.width // new_width
         block_height = self.height // new_height
 
-        new_end_points = []
-        for point in self.end_points:
-            new_point = {
-                'center': (point['center'][0] // block_width, point['center'][1] // block_height),
-                'type': point['type']
-            }
-            new_end_points.append(new_point)
-
-        new_grid.end_points = new_end_points
-
+       #scale points and staggered points using def scale_points
+        new_grid.end_points = self.scaled_points(block_width, block_height)
         for new_y in range(new_height):
             for new_x in range(new_width):
                 start_y = int(new_y * block_height)
@@ -248,6 +217,24 @@ class Grid:
 
         return new_grid
 
+    def scaled_points(self, block_width, block_height):
+        scaled_points = []
+        for point in self.end_points:
+            if point['staggered'] is None:
+                scaled_point = {
+                    'center': (point['center'][0] // block_width, point['center'][1] // block_height),
+                    'staggered': None,
+                    'type': point['type']
+                }
+                scaled_points.append(scaled_point)
+            else:
+                scaled_point = {
+                'center': (point['center'][0] // block_width, point['center'][1] // block_height),
+                'staggered': (point['staggered'][0] // block_width, point['staggered'][1] // block_height),
+                'type': point['type']
+                }
+            scaled_points.append(scaled_point)
+        return scaled_points
     def cell_withing_bounds(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
 

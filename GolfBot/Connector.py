@@ -29,8 +29,10 @@ class Connector:
 
     def process_image(self, detected_objects):
         self.grid.add_detected_object(detected_objects)
-        self.grid.add_detected_endpoint(detected_objects)
+        self.grid.add_detected_endpoint(detected_objects, 100)
+        print('endpoints before scale: ' + str(self.grid.end_points))
         self.grid = self.grid.scaled_to(192, 108)
+        print('endpoints after scale: ' + str(self.grid.end_points))
 
         print(self.grid)
         pathfinder = PathFinder(self.grid)
