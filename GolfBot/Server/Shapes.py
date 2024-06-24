@@ -31,11 +31,11 @@ class Box(Shape):
 
     @property
     def width(self) -> float:
-        return self.x2 - self.x1
+        return abs(self.x2 - self.x1)
 
     @property
     def height(self) -> float:
-        return self.y2 - self.y1
+        return abs(self.y2 - self.y1)
 
     @property
     def dimensions(self) -> (float, float):
