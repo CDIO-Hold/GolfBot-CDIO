@@ -1,6 +1,5 @@
 import math
-from .Angle import Angle
-from .AngleMath import AngleMath
+from GolfBot.Server.Basics import Angle, AngleMath
 
 
 # (Private) Helper method for some parts of construction
