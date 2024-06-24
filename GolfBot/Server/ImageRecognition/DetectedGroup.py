@@ -9,6 +9,15 @@ class DetectedGroup:
     def add(self, obj: DetectedObject):
         self.objects.append(obj)
 
+    def get_by_name(self, object_name: str) -> (DetectedObject | None):
+        for obj in self.objects:
+            if obj.name == object_name:
+                return obj
+        return None
+
+    def __getitem__(self, item):
+        return self.objects[item]
+
     @property
     def is_empty(self) -> bool:
         return len(self.objects) == 0
