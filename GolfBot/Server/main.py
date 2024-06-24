@@ -44,6 +44,8 @@ robot = RobotClient(screen_to_world)
 print("Ready")
 # input("Press enter to continue")
 robot.connect("127.0.0.1", 8000)
+
+goals = dict()
 while True:
     print("Finding objects...")
     picture = camera.take_picture()
@@ -73,12 +75,26 @@ while True:
         left_goal_width = 200 * scale
         left_center = left.get_center()
         left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2)))
-        grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
+        # grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
 
         right_goal_width = 80 * scale
         right_center = right.get_center()
         right_goal = Box(Vector(right.x1, right_center.y - (right_goal_width // 2)), Vector(right.x2, right_center.y + (right_goal_width // 2)))
         # grid.add_endpoint(right_goal.get_center(), "goal", safe_zone=0)
+
+        left_goal_endpoint = {
+            'center': left_goal.get_center().as_tuple(),
+            'staggered': None,
+            'type': 'goal'
+        }
+        right_goal_endpoint = {
+            'center': right_goal.get_center().as_tuple(),
+            'staggered': None,
+            'type': 'goal'
+        }
+
+        goals['left'] = left_goal_endpoint
+        goals['right'] = right_goal_endpoint
 
     if "cross" in keyed_groups:
         for cross_box in detected_group_to_shapes(keyed_groups["cross"]):
@@ -118,7 +134,7 @@ while True:
         path = pathfinder.find_path ((x, y), grid.end_points[0])
         type = grid.end_points[0]['type']
     else:
-        path = []
+        path = pathfinder.find_path((x, y), goals['left'])
         print('mangler at gøre noget')
     robot.collect()
     for position in path:
