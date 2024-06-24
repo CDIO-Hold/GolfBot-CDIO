@@ -1,4 +1,4 @@
-from GolfBot.Server.Basics.Box import Box
+from GolfBot.Server.Basics import Box
 
 
 class Egg:

@@ -2,8 +2,7 @@
 
 from .Angle import Angle, AngleUnit, degrees, radians, percent, CardinalDirection
 from .AngleMath import AngleMath
-from .Box import Box
-from .Circle import Circle
+from .Shapes import Shape, Box, Circle, MultiShape, AngledShape
 from .ConnectionInfo import ConnectionInfo
 from .DistanceMath import DistanceMath
 from .DriveSpeed import DriveSpeed
