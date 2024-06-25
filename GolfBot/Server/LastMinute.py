@@ -1,5 +1,6 @@
 from Vector import Vector
 from DistanceMath import DistanceMath
+from Shapes import Box as ScreenBox
 
 
 class Line:
@@ -103,6 +104,9 @@ class Field:
             Vector(quarter_width * 2, quarter_height * 3)
         ]
 
+    def is_inside(self, position: Vector):
+        return 0 <= position.x <= self.width and 0 <= position.y <= self.height
+
     def insert_cross(self, center: Vector):
         left_x = center.x - 100
         right_x = center.x + 100
@@ -150,3 +154,48 @@ def nearest_of(position: Vector, candidates: list):
             min_distance = distance
             nearest = other
     return nearest
+
+
+class ScreenToWorld:
+    def __init__(self):
+        self.height_scale = 1
+        self.width_scale = 1
+
+        self.x_offset = 0
+        self.y_offset = 0
+
+    def calibrate_from_walls(self, screen_wall_boxes: list[ScreenBox]):
+        left_right = sorted(screen_wall_boxes, key=lambda box: box.width)[:2]
+        top_bottom = sorted(screen_wall_boxes, key=lambda box: box.height)[:2]
+
+        left, right = sorted(left_right, key=lambda box: box.get_center().x)
+        top, bottom = sorted(top_bottom, key=lambda box: box.get_center().y)
+
+        box = ScreenBox(Vector(left.x1, top.y1), Vector(right.x2, bottom.y2))
+        self.calibrate(box)
+
+    def calibrate(self, screen_field: ScreenBox):
+        self.height_scale = 1200 / screen_field.height
+        self.width_scale = 1800 / screen_field.width
+
+        self.x_offset = screen_field.top_left.x
+        self.y_offset = screen_field.top_left.y
+
+    def vector(self, position: Vector) -> Vector:
+        return Vector(
+            (position.x - self.x_offset) * self.width_scale,
+            1200 - (position.y - self.y_offset) * self.height_scale
+        )
+
+
+if __name__ == '__main__':
+    walls = [
+            ScreenBox(Vector(191, 3), Vector(226, 680)),
+            ScreenBox(Vector(1022, 9), Vector(1058, 669)),
+            ScreenBox(Vector(187, 17), Vector(1059, 35)),
+            ScreenBox(Vector(168, 633), Vector(1084, 658)),
+        ]
+
+    screen_to_world = ScreenToWorld()
+    screen_to_world.calibrate_from_walls(walls)
+    print(screen_to_world.vector(Vector(191, 3)))
