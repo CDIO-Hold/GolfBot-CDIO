@@ -10,13 +10,12 @@ class Grid:
         self.end_points = []
 
     def add_box(self, box, object_type: str):
-        print(f"Adding {object_type}")
+        #print(f"Adding {object_type}")
         number = self.obj_type_to_int(object_type)
         self.add_2d_object(int(box.x1), int(box.x2), int(box.y1), int(box.y2), number)
         return
 
-    def add_endpoint(self, center, endpoint_type: str, safe_zone=100):
-            print("adding endpoint : " + endpoint_type)
+    def add_endpoint(self, center, endpoint_type: str, safe_zone=0):
             center_x, center_y = (int (n) for n in center.as_tuple())
             self.add_object(center_x, center_y, self.obj_type_to_int(endpoint_type))
 
@@ -24,7 +23,6 @@ class Grid:
             distance_and_direction = self.direction_and_distance_to_closest_object(center_x, center_y, safe_zone)
             direction = next(iter(distance_and_direction))
             distance = distance_and_direction[direction]
-            print("distance and direction to closest object: " + str(distance_and_direction))
             if distance > safe_zone:
                 end_point = {
                     'center': (center_x, center_y),
@@ -64,7 +62,7 @@ class Grid:
             current_cell = (center_x, center_y - movement[1])
             #print("checking straight up cell on grid: " + str(current_cell))
             if not self.is_empty_space(current_cell[0], current_cell[1]):
-                print('found an obstacle above ' + str(current_distance) + ' away')
+                #print('found an obstacle above ' + str(current_distance) + ' away')
                 straight_up['straight_up'] = current_distance
                 break
 
@@ -83,7 +81,7 @@ class Grid:
             current_cell = (center_x + movement[0], center_y)
             #print("checking straight left cell on grid: " + str(current_cell))
             if not self.is_empty_space(current_cell[0], current_cell[1]):
-                print('found an obstacle to the left ' + str(current_distance) + ' away')
+                #print('found an obstacle to the left ' + str(current_distance) + ' away')
                 straight_left['straight_left'] = current_distance
                 break
 
@@ -92,7 +90,7 @@ class Grid:
             current_cell = (center_x + movement[0], center_y)
             #print("checking straight right cell on grid: " + str(current_cell))
             if not self.is_empty_space(current_cell[0], current_cell[1]):
-                print('found an obstacle to the right ' + str(current_distance) + ' away')
+                #print('found an obstacle to the right ' + str(current_distance) + ' away')
                 straight_right['straight_right'] = current_distance
                 break
 

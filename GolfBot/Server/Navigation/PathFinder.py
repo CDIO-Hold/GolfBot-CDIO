@@ -51,7 +51,7 @@ class PathFinder:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
             if self.is_valid_position(neighbor_x, neighbor_y):
-                if not self.will_collide(neighbor_x, neighbor_y, 2):
+                if not self.will_collide(neighbor_x, neighbor_y, 50):
                     neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors
@@ -89,8 +89,8 @@ class PathFinder:
             full_path = self.astar(start, end_goal)
         else: #first go to staggered position then end goal
             full_path = self.astar(start, staggered)
-            print('path to staggered: ', full_path)
-            print('path to goal from: ', full_path)
+        #    print('path to staggered: ', full_path)
+         #   print('path to goal from: ', full_path)
         print('path before' + str(full_path))
         full_path = self.identify_corners(full_path)
         #final_path = corner_path.append(goal)

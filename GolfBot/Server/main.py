@@ -1,4 +1,4 @@
-from Camera import Camera
+from Camera import Camera, Image
 from GolfBot.Server.Navigation import Grid, PathFinder
 from YOLO import Yolo
 from RobotClient import RobotClient, ScreenToWorld
@@ -17,7 +17,8 @@ scale = 1.0
 real_ball_size = 40  # mm
 while True:
     print("Taking a picture")
-    picture = camera.take_picture()
+    #picture = camera.take_picture()
+
     if picture.data is None:
         continue
 
@@ -37,12 +38,13 @@ while True:
     screen_ball_size = max(balls[0].width, balls[0].height)
     scale = real_ball_size / screen_ball_size
     break
-
+radius = int(150 // scale) + 1
 print("Initializing server...")
 screen_to_world = ScreenToWorld(camera, scale=scale)
 robot = RobotClient(screen_to_world)
 print("Ready")
 # input("Press enter to continue")
+
 robot.connect("127.0.0.1", 8000)
 
 goals = dict()
@@ -111,7 +113,7 @@ while True:
             ball_box = shapes[i]
             name = keyed_groups["ball"].objects[i].name
             grid.add_box(ball_box, name)
-            grid.add_endpoint(ball_box.get_center(), name)
+            grid.add_endpoint(ball_box.get_center(), name, radius)
 
     if "robot" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["robot"])
@@ -123,19 +125,24 @@ while True:
             print("Updating robot position")
             robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
             grid.add_box(robot_box, "robot")
-    print(grid.end_points)
     pathfinder = PathFinder(grid)
 
     robot_info = robot.get_info()
     position = robot_info.split(" ")[0]
     x, y = (int(p.split(".")[0]) for p in position.split(","))
-    #grid = grid.scaled_to(picture.width//10, picture.height//10)
+    grid.sorted_end_points((x, y))
+    print('Endpoints: ')
+    print(grid.end_points)
+
     if len(grid.end_points) > 0:
-        path = pathfinder.find_path ((x, y), grid.end_points[0])
+        path = pathfinder.find_path((x, y), grid.end_points[0])
+        print(f"Rute givet: {path}")
         type = grid.end_points[0]['type']
     else:
+        print(f'Kører til mål ({goals["left"]["center"]})')
         path = pathfinder.find_path((x, y), goals['left'])
-        print('mangler at gøre noget')
+
+    print("Starting collection")
     robot.collect()
     for position in path:
         x, y = position

@@ -28,7 +28,7 @@ right_conveyor = ev3_motors.OUTPUT_A
 drive_steering = ev3_motors.MoveTank(left_wheel, right_wheel, motor_class=ev3_motors.LargeMotor)
 straight_speed = 40
 turn_speed = 10
-wheel = Circle(diameter=68.8)
+wheel = Circle(diameter=68.8 * 0.9)  # Only 90 percent
 wheel_distance = 111
 turn_circle = Circle(diameter=wheel_distance)
 driver = Driver(drive_steering, straight_speed, turn_speed, wheel, turn_circle)
