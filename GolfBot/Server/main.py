@@ -20,6 +20,7 @@ print("Ready")
 robot.connect("127.0.0.1", 8000)
 
 screen_to_world = ScreenToWorld()
+safe_index = 0
 
 goals = dict()
 while True:
@@ -79,3 +80,7 @@ while True:
 
     balls = field.get_seen_balls(Vector(x, y))
     print(balls)
+    target = field.safe_zones[safe_index]
+    robot.move_to(target)
+
+    safe_index = (safe_index + 1) % 4
