@@ -77,85 +77,6 @@ class Ball(Circle):
         self.color = color
 
 
-class Field:
-    def __init__(self):
-        self.width = 1800
-        self.height = 1200
-        self.balls = []
-        self.obstacles = []
-
-    @property
-    def corners(self):
-        return [
-            Vector(0, 0),
-            Vector(self.width, 0),
-            Vector(self.width, self.height),
-            Vector(0, self.height)
-        ]
-
-    @property
-    def safe_zones(self):
-        quarter_width = self.width // 4
-        quarter_height = self.height // 4
-        return [
-            Vector(quarter_width, quarter_height * 2),
-            Vector(quarter_width * 2, quarter_height),
-            Vector(quarter_width * 3, quarter_height * 2),
-            Vector(quarter_width * 2, quarter_height * 3)
-        ]
-
-    def is_inside(self, position: Vector):
-        return 0 <= position.x <= self.width and 0 <= position.y <= self.height
-
-    def insert_cross(self, center: Vector):
-        left_x = center.x - 100
-        right_x = center.x + 100
-        top_y = center.y + 100
-        bottom_y = center.y - 100
-
-        cross_width = 30
-        half_width = int(cross_width // 2)
-
-        horizontal = Box(Vector(left_x, center.y - half_width), Vector(right_x, center.y + half_width))
-        vertical = Box(Vector(center.x - half_width, top_y), Vector(center.x + half_width, bottom_y))
-        self.obstacles.append(horizontal)
-        self.obstacles.append(vertical)
-
-    def insert_egg(self, center: Vector):
-        egg_width = 100
-        egg = Circle(center, diameter=egg_width)
-        self.obstacles.append(egg)
-
-    def insert_ball(self, center: Vector, color: str):
-        ball_width = 40
-        ball = Ball(center, color, diameter=ball_width)
-        self.balls.append(ball)
-
-    def can_drive_straight(self, start: Vector, end: Vector):
-        drive_line = Line(start, end)
-        return self.can_drive_line(drive_line)
-
-    def can_drive_line(self, drive_line: Line):
-        for obstacle in self.obstacles:
-            if obstacle.intersects(drive_line):
-                return False
-        return True
-
-    def get_seen_balls(self, position: Vector):
-        return [ball for ball in self.balls if self.can_drive_straight(position, ball.get_center())]
-
-
-def nearest_of(position: Vector, *candidates: Vector):
-    nearest = None
-    min_distance = float('inf')
-    for other in candidates:
-        travel = Vector.from_points(position, other)
-        if travel.length < min_distance:
-            min_distance = travel.length
-            nearest = other
-    return nearest
-
-
 class ScreenToWorld:
     def __init__(self):
         self.height_scale = 1
@@ -186,6 +107,99 @@ class ScreenToWorld:
             (position.x - self.x_offset) * self.width_scale,
             1200 - (position.y - self.y_offset) * self.height_scale
         )
+
+    def box(self, box: Box) -> Box:
+        return Box(self.vector(box.top_left), self.vector(box.bottom_right))
+
+
+class Field:
+    def __init__(self):
+        self.width = 1800
+        self.height = 1200
+        self.balls = []
+        self.obstacles = []
+
+    @property
+    def corners(self):
+        return [
+            Vector(0, 0),
+            Vector(self.width, 0),
+            Vector(self.width, self.height),
+            Vector(0, self.height)
+        ]
+
+    @property
+    def safe_zones(self):
+        quarter_width = self.width // 4
+        quarter_height = self.height // 4
+        return [
+            Vector(quarter_width, quarter_height * 2),
+            Vector(quarter_width * 2, quarter_height),
+            Vector(quarter_width * 3, quarter_height * 2),
+            Vector(quarter_width * 2, quarter_height * 3)
+        ]
+
+    def is_inside(self, position: Vector):
+        return 0 <= position.x <= self.width and 0 <= position.y <= self.height
+
+    def insert_cross(self, center: Vector, screen_to_world: ScreenToWorld = None):
+        left_x = center.x - 100
+        right_x = center.x + 100
+        top_y = center.y + 100
+        bottom_y = center.y - 100
+
+        cross_width = 30
+        half_width = int(cross_width // 2)
+
+        horizontal = Box(Vector(left_x, center.y - half_width), Vector(right_x, center.y + half_width))
+        vertical = Box(Vector(center.x - half_width, top_y), Vector(center.x + half_width, bottom_y))
+
+        if screen_to_world is not None:
+            horizontal = screen_to_world.box(horizontal)
+            vertical = screen_to_world.box(vertical)
+
+        self.obstacles.append(horizontal)
+        self.obstacles.append(vertical)
+
+    def insert_egg(self, center: Vector, screen_to_world: ScreenToWorld = None):
+        if screen_to_world is not None:
+            center = screen_to_world.vector(center)
+
+        egg_width = 100
+        egg = Circle(center, diameter=egg_width)
+        self.obstacles.append(egg)
+
+    def insert_ball(self, center: Vector, color: str, screen_to_world: ScreenToWorld = None):
+        if screen_to_world is not None:
+            center = screen_to_world.vector(center)
+
+        ball_width = 40
+        ball = Ball(center, color, diameter=ball_width)
+        self.balls.append(ball)
+
+    def can_drive_straight(self, start: Vector, end: Vector):
+        drive_line = Line(start, end)
+        return self.can_drive_line(drive_line)
+
+    def can_drive_line(self, drive_line: Line):
+        for obstacle in self.obstacles:
+            if obstacle.intersects(drive_line):
+                return False
+        return True
+
+    def get_seen_balls(self, position: Vector):
+        return [ball for ball in self.balls if self.can_drive_straight(position, ball.get_center())]
+
+
+def nearest_of(position: Vector, *candidates: Vector):
+    nearest = None
+    min_distance = float('inf')
+    for other in candidates:
+        travel = Vector.from_points(position, other)
+        if travel.length < min_distance:
+            min_distance = travel.length
+            nearest = other
+    return nearest
 
 
 if __name__ == '__main__':

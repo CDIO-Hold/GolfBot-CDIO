@@ -33,7 +33,8 @@ while True:
     groups = yolo.find_objects(picture)
     keyed_groups = dict()
     for group in groups:
-        keyed_groups[group.name] = group
+        if not group.is_empty:
+            keyed_groups[group.name] = group
 
     # initialize grid
     field = Field()
@@ -47,11 +48,11 @@ while True:
 
     if "cross" in keyed_groups:
         cross_box = detected_group_to_shapes(keyed_groups["cross"])[0]
-        field.insert_cross(cross_box.get_center())
+        field.insert_cross(cross_box.get_center(), screen_to_world)
 
     if "egg" in keyed_groups:
         egg_box = detected_group_to_shapes(keyed_groups["egg"])[0]
-        field.insert_egg(egg_box.get_center())
+        field.insert_egg(egg_box.get_center(), screen_to_world)
 
     if "ball" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["ball"])
@@ -61,14 +62,14 @@ while True:
             name = keyed_groups["ball"].objects[i].name
             color = name.split("-")[0]
 
-            field.insert_ball(ball_box.get_center(), color)
+            field.insert_ball(ball_box.get_center(), color, screen_to_world)
 
     if "robot" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["robot"])
         if len(shapes) == 1:
             robot_shape = shapes[0]
-            robot_box = robot_shape.shape
-            robot_angle = robot_shape.angle
+            robot_box = screen_to_world.box(robot_shape.shape)
+            robot_angle = robot_shape.angle * -1
 
             print("Updating robot position")
             robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
@@ -78,4 +79,4 @@ while True:
     x, y = (int(p.split(".")[0]) for p in position.split(","))
 
     balls = field.get_seen_balls(Vector(x, y))
-    print(balls)
+    print([(str(ball.get_center()), ball.color) for ball in balls])
