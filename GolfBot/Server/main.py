@@ -6,6 +6,7 @@ from Vector import Vector
 from Angle import degrees
 from Shapes import Box
 from DetectedToModel import detected_group_to_shapes
+from math import sqrt
 
 
 print("Starting camera...")
@@ -83,7 +84,7 @@ while True:
         # Add the goals
         left_goal_width = 200 * scale
         left_center = left.get_center()
-        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2) - 20))
+        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2) - 40))
         # grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
 
         right_goal_width = 80 * scale
@@ -138,7 +139,7 @@ while True:
             robot_position['center'] = (x, y)
             grid.add_box(robot_box, "robot")
     pathfinder = PathFinder(grid)
-    print(grid.scaled_to(128, 72))
+    #print(grid.scaled_to(128, 72))
 
     grid.sorted_end_points(robot_position['center'])
     print('Endpoints: ')
@@ -148,12 +149,27 @@ while True:
         path = pathfinder.find_path(robot_position['center'], grid.end_points[0])
         print(f"Rute givet: {path}")
         type = grid.end_points[0]['type']
+        print("Starting collection")
+        robot.collect()
     else:
-        print(f'Kører til mål ({goals["left"]["center"]})')
-        path = [goals["left"]["center"]]
+        robot_x, robot_y = robot_position['center']
+        goal_x, goal_y = goals["left"]["center"]
 
-    print("Starting collection")
-    robot.collect()
+        distance = grid.taxi_distance((robot_x, robot_y), (goal_x, goal_y))
+        threshold = 150  # define a threshold distance
+
+        if len(grid.end_points) < 1 and distance < threshold:
+            # don't drive, just shoot
+            path = []
+            print("unloading")
+            robot.unload()
+        else:
+            print(f'Kører til mål ({goals["left"]["center"]})')
+            path = [goals["left"]["center"]]
+            print("Starting collection")
+            robot.collect()
+
+
 
     #visualize_path(grid, path, robot_position['center'], grid.end_points[0])
     for position in path:
