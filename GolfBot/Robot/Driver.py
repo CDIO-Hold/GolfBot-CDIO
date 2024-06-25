@@ -15,8 +15,10 @@ class Driver:
         self.turn_circle = turn_circle
 
     def turn(self, degrees):
-        if degrees < 0:
-            self.turn_right(abs(degrees))
+        degrees %= 360
+
+        if degrees > 180:
+            self.turn_right(360 - degrees)
         else:
             self.turn_left(degrees)
 
