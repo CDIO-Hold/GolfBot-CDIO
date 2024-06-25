@@ -33,8 +33,8 @@ class Grid:
             else:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
-                staggered_end_point = self.stagger_end_point(center_x, center_y, endpoint_type, direction, stagger_distance)
-                self.add_end_point(staggered_end_point)
+                #staggered_end_point = self.stagger_end_point(center_x, center_y, endpoint_type, direction, stagger_distance)
+                #self.add_end_point(staggered_end_point)
             return
 
     #function that determines if something is close to a recently added endpoint
@@ -159,7 +159,10 @@ class Grid:
                 goals.append(obj)
 
         # Sort white balls by distance
-        white_balls.sort(key = lambda x: self.taxi_distance(current_position, x['center']))
+        # Update the sorting logic
+        white_balls.sort(key=lambda x: (
+        self.taxi_distance(current_position, x['center']) <= 60, self.taxi_distance(current_position, x['center'])))
+
         # Sort orange balls by distance
 
         # Combine the sorted lists

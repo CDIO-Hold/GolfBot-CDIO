@@ -154,16 +154,8 @@ while True:
 
     print("Starting collection")
     robot.collect()
-    def visualize_path(grid, path, start, goal):
-        display_grid = Grid(grid.width, grid.height)
-        display_grid.grid = grid.grid.copy()
-        for pos in path:
-            display_grid.add_object(pos[0], pos[1], 2)
-        display_grid.add_object(start[0], start[1], 6)
-        display_grid.add_object(goal[0], goal[1], 9)
-        print(display_grid)
 
-    visualize_path(grid, path, robot_position['center'], grid.end_points[0])
+    #visualize_path(grid, path, robot_position['center'], grid.end_points[0])
     for position in path:
         x, y = position
         x = int(x)
