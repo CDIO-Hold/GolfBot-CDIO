@@ -48,6 +48,12 @@ print("Ready")
 robot.connect("127.0.0.1", 8000)
 
 goals = dict()
+
+robot_position = {
+    'center': (0, 0),
+    'staggered': None,
+    'type': 'robot'
+}
 while True:
     print("Finding objects...")
     picture = camera.take_picture()
@@ -113,7 +119,8 @@ while True:
         for i in range(len(shapes)):
             ball_box = shapes[i]
             name = keyed_groups["ball"].objects[i].name
-            grid.add_box(ball_box, name)
+            x, y = ball_box.get_center().as_tuple()
+            grid.add_object(x, y, name)
             grid.add_endpoint(ball_box.get_center(), name, radius)
 
     if "robot" in keyed_groups:
@@ -125,23 +132,25 @@ while True:
 
             print("Updating robot position")
             robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
+            x, y = robot_box.get_center().as_tuple()
+            x = int(x)
+            y = int(y)
+            robot_position['center'] = (x, y)
             grid.add_box(robot_box, "robot")
     pathfinder = PathFinder(grid)
     print(grid.scaled_to(128, 72))
-    robot_info = robot.get_info()
-    position = robot_info.split(" ")[0]
-    x, y = (int(p.split(".")[0]) for p in position.split(","))
-    grid.sorted_end_points((x, y))
+
+    grid.sorted_end_points(robot_position['center'])
     print('Endpoints: ')
     print(grid.end_points)
 
     if len(grid.end_points) > 0:
-        path = pathfinder.find_path((x, y), grid.end_points[0])
+        path = pathfinder.find_path(robot_position['center'], grid.end_points[0])
         print(f"Rute givet: {path}")
         type = grid.end_points[0]['type']
     else:
         print(f'Kører til mål ({goals["left"]["center"]})')
-        path = pathfinder.find_path((x, y), goals['left'])
+        path = goals["left"]["center"]
 
     print("Starting collection")
     robot.collect()

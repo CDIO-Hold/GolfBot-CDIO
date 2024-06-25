@@ -17,6 +17,7 @@ robot_ip = "192.168.124.17"
 robot_port = 18812
 robot_connection = rpyc.classic.connect(robot_ip, robot_port)
 ev3_motors = robot_connection.modules['ev3dev2.motor']
+ev3_sound = robot_connection.modules['ev3dev2.sound']
 
 # Hardcoded values, found by looking at the robot wires
 left_wheel = ev3_motors.OUTPUT_B
@@ -37,8 +38,10 @@ driver = Driver(drive_steering, straight_speed, turn_speed, wheel, turn_circle)
 conveyor_steering = ev3_motors.MoveSteering(left_conveyor, right_conveyor, motor_class=ev3_motors.MediumMotor)
 collector = Collector(conveyor_steering, 40)
 
+speaker = ev3_sound.Sound()
+
 print("Initializing robot...")
-robot = Robot(driver, collector)
+robot = Robot(driver, collector, speaker)
 print("Robot initialized")
 
 while True:
@@ -53,7 +56,9 @@ while True:
         x, y = target.split(",")
         target = Vector(float(x), float(y))
         print("Moving to {}".format((x, y)))
+        robot.speak("Moving")
         robot.drive_to(target)
+        robot.speak("Done moving")
         print("Done moving to {}".format((x, y)))
     elif action == "collect":
         robot.collector.start_loading()
@@ -66,6 +71,7 @@ while True:
         robot.set_rotation(float(angle))
         print("New position: {}".format((x, y)))
         print("New rotation: {} degrees".format(float(angle)))
+        robot.speak("Update received")
     elif action == "stop":
         robot.collector.stop()
     elif action.startswith("turn"):
@@ -78,6 +84,9 @@ while True:
             answer = b'Unknown direction'
     elif action == "info":
         answer = "{},{} {}".format(robot.position.x, robot.position.y, robot.facing).encode("utf-8")
+    elif action.startswith("say"):
+        phrase = " ".join(action.split(" ")[1:])
+        robot.speak(phrase)
     else:
         answer = b"Unknown command"
 

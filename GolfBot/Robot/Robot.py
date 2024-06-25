@@ -6,9 +6,10 @@ from Collector import Collector
 
 
 class Robot:
-    def __init__(self, driver: Driver, collector: Collector):
+    def __init__(self, driver: Driver, collector: Collector, speaker):
         self.driver = driver
         self.collector = collector
+        self.speaker = speaker
 
         # TODO
         self.size = 10
@@ -63,6 +64,9 @@ class Robot:
         # Update state
         self.position.x += drive_vector.x
         self.position.y += drive_vector.y
+
+    def speak(self, phrase: str, volume: int = 100):
+        self.speaker.speak(phrase, volume=volume, play_type=1)
 
     def follow_path(self, path: list):
         for position in path:
