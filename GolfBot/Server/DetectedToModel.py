@@ -31,7 +31,7 @@ def detected_group_to_shapes(group: DetectedGroup) -> list[Shape | AngledShape]:
         robot_shape = AngledShape(robot_bounds, robot_vector.angle)
         return [robot_shape]
     elif group.name == "cross":
-        shapes = [obj for obj in group.objects]
+        shapes = [obj.bounding for obj in group.objects]
         shape = MultiShape(*shapes)
         return [shape]
 
