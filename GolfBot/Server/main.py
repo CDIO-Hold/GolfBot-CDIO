@@ -81,7 +81,7 @@ while True:
 
     balls = field.get_seen_balls(Vector(x, y))
     print([(str(ball.get_center()), ball.color) for ball in balls])
+
     target = field.safe_zones[safe_index]
     robot.move_to(target)
-
     safe_index = (safe_index + 1) % 4

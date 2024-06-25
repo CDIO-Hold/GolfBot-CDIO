@@ -55,6 +55,13 @@ while True:
         print("Moving to {}".format((x, y)))
         robot.drive_to(target)
         print("Done moving to {}".format((x, y)))
+    elif action.startswith("reverse"):
+        target = action.split(" ")[1]
+        x, y = target.split(",")
+        target = Vector(float(x), float(y))
+        print("Reversing to {}".format((x, y)))
+        robot.reverse_to(target)
+        print("Done reversing to {}".format((x, y)))
     elif action == "collect":
         robot.collector.start_loading()
     elif action == "shoot":
