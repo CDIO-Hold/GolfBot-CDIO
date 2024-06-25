@@ -44,15 +44,15 @@ class Box(Shape):
         def intersect(A, B, C, D):
             return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
 
-        intersection = False
+        intersecting = False
         for own_line in own_lines:
             a, b = line.start, line.end
             c, d = own_line.start, own_line.end
 
             if intersect(a, b, c, d):
-                intersection = True
+                intersecting = True
                 break
-        return intersection
+        return intersecting
 
     def get_center(self):
         return Vector((self.top_left.x + self.bottom_right.x) / 2, (self.top_left.y + self.bottom_right.y) / 2)
