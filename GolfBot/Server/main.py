@@ -1,55 +1,30 @@
 from Camera import Camera
 from GolfBot.Server.Navigation import Grid, PathFinder
 from YOLO import Yolo
-from RobotClient import RobotClient, ScreenToWorld
+from RobotClient import RobotClient
 from Vector import Vector
 from Angle import degrees
 from Shapes import Box
 from DetectedToModel import detected_group_to_shapes
+from LastMinute import *
 
 
 print("Starting camera...")
 camera = Camera(0)
 print("Initializing YOLO...")
 yolo = Yolo()
-print("Figuring out the scale")
-scale = 1.0
-real_ball_size = 40  # mm
-while True:
-    print("Taking a picture")
-    picture = camera.take_picture()
-    if picture.data is None:
-        continue
-
-    print("Finding a ball")
-    groups = yolo.find_objects(picture)
-
-    ball_group = None
-    for group in groups:
-        if group.name == "ball":
-            ball_group = group
-            break
-
-    if ball_group is None or ball_group.is_empty:
-        continue
-
-    balls = detected_group_to_shapes(ball_group)
-    screen_ball_size = max(balls[0].width, balls[0].height)
-    scale = real_ball_size / screen_ball_size
-    break
-
 print("Initializing server...")
-screen_to_world = ScreenToWorld(camera, scale=scale)
-robot = RobotClient(screen_to_world)
+robot = RobotClient()
 print("Ready")
 # input("Press enter to continue")
 robot.connect("127.0.0.1", 8000)
+
+screen_to_world = ScreenToWorld()
 
 goals = dict()
 while True:
     print("Finding objects...")
     picture = camera.take_picture()
-
 
     if picture.data is None:
         print("Error while taking the picture. Trying again...")
@@ -61,48 +36,22 @@ while True:
         keyed_groups[group.name] = group
 
     # initialize grid
-    grid = Grid(picture.width, picture.height)
+    field = Field()
+
     if "wall" in keyed_groups:
         walls = []
         for wall_box in detected_group_to_shapes(keyed_groups["wall"]):
-            grid.add_box(wall_box, "wall")
             walls.append(wall_box)
-        left_and_right = sorted(walls, key=lambda box: box.width)[:2]
 
-        left, right = sorted(left_and_right, key=lambda box: box.get_center().x)
-
-        # Add the goals
-        left_goal_width = 200 * scale
-        left_center = left.get_center()
-        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2)))
-        # grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
-
-        right_goal_width = 80 * scale
-        right_center = right.get_center()
-        right_goal = Box(Vector(right.x1, right_center.y - (right_goal_width // 2)), Vector(right.x2, right_center.y + (right_goal_width // 2)))
-        # grid.add_endpoint(right_goal.get_center(), "goal", safe_zone=0)
-
-        left_goal_endpoint = {
-            'center': left_goal.get_center().as_tuple(),
-            'staggered': None,
-            'type': 'goal'
-        }
-        right_goal_endpoint = {
-            'center': right_goal.get_center().as_tuple(),
-            'staggered': None,
-            'type': 'goal'
-        }
-
-        goals['left'] = left_goal_endpoint
-        goals['right'] = right_goal_endpoint
+        screen_to_world.calibrate_from_walls(walls)
 
     if "cross" in keyed_groups:
-        for cross_box in detected_group_to_shapes(keyed_groups["cross"]):
-            grid.add_box(cross_box, "wall")
+        cross_box = detected_group_to_shapes(keyed_groups["cross"])[0]
+        field.insert_cross(cross_box.get_center())
 
     if "egg" in keyed_groups:
-        for egg_box in detected_group_to_shapes(keyed_groups["egg"]):
-            grid.add_box(egg_box, "egg")
+        egg_box = detected_group_to_shapes(keyed_groups["egg"])[0]
+        field.insert_egg(egg_box.get_center())
 
     if "ball" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["ball"])
@@ -110,8 +59,9 @@ while True:
         for i in range(len(shapes)):
             ball_box = shapes[i]
             name = keyed_groups["ball"].objects[i].name
-            grid.add_box(ball_box, name)
-            grid.add_endpoint(ball_box.get_center(), name)
+            color = name.split("-")[0]
+
+            field.insert_ball(ball_box.get_center(), color)
 
     if "robot" in keyed_groups:
         shapes = detected_group_to_shapes(keyed_groups["robot"])
@@ -122,23 +72,10 @@ while True:
 
             print("Updating robot position")
             robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
-            grid.add_box(robot_box, "robot")
-    print(grid.end_points)
-    pathfinder = PathFinder(grid)
 
     robot_info = robot.get_info()
     position = robot_info.split(" ")[0]
     x, y = (int(p.split(".")[0]) for p in position.split(","))
-    #grid = grid.scaled_to(picture.width//10, picture.height//10)
-    if len(grid.end_points) > 0:
-        path = pathfinder.find_path ((x, y), grid.end_points[0])
-        type = grid.end_points[0]['type']
-    else:
-        path = pathfinder.find_path((x, y), goals['left'])
-        print('mangler at gøre noget')
-    robot.collect()
-    for position in path:
-        x, y = position
-        robot.move_to(Vector(x, y))
 
-    # break
+    balls = field.get_seen_balls(Vector(x, y))
+    print(balls)

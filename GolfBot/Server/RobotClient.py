@@ -22,9 +22,8 @@ class ScreenToWorld:
 
 
 class RobotClient:
-    def __init__(self, screen_to_world: ScreenToWorld):
+    def __init__(self):
         self.socket = socket(AF_INET, SOCK_DGRAM)
-        self.converter = screen_to_world
 
     def connect(self, ip_address: str, port: int):
         self.socket.connect((ip_address, port))
@@ -35,16 +34,11 @@ class RobotClient:
             return None
         return self.socket.recv(1024).decode("utf-8")
 
-    def update_info(self, screen_position: Vector, screen_angle: float):
-        robot_position = self.converter.convert_vector(screen_position)
-        robot_angle = self.converter.convert_angle(screen_angle)
+    def update_info(self, position: Vector, angle: float):
+        self.send(f"robot {position.x},{position.y} {angle}")
 
-        self.send(f"robot {robot_position.x},{robot_position.y} {robot_angle}")
-
-    def move_to(self, screen_position: Vector):
-        robot_position = self.converter.convert_vector(screen_position)
-
-        self.send(f"goto {robot_position.x},{robot_position.y}")
+    def move_to(self, position: Vector):
+        self.send(f"goto {position.x},{position.y}")
 
     def collect(self):
         self.send("collect")
