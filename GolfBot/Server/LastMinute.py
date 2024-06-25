@@ -145,13 +145,13 @@ class Field:
         return [ball for ball in self.balls if self.can_drive_straight(position, ball.get_center())]
 
 
-def nearest_of(position: Vector, candidates: list):
+def nearest_of(position: Vector, *candidates: Vector):
     nearest = None
     min_distance = float('inf')
     for other in candidates:
-        distance = DistanceMath.real_distance(position, other.center)
-        if distance < min_distance:
-            min_distance = distance
+        travel = Vector.from_points(position, other)
+        if travel.length < min_distance:
+            min_distance = travel.length
             nearest = other
     return nearest
 
