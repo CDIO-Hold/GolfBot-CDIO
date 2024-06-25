@@ -54,7 +54,7 @@ class PathFinder:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
             if self.is_valid_position(neighbor_x, neighbor_y):
-                if not self.will_collide(neighbor_x, neighbor_y, 5):
+                if not self.will_collide(neighbor_x, neighbor_y, 40):
                     #print('adding a neighbor at: ' + str(neighbor_x) + ', ' + str(neighbor_y))
                     neighbors.append((neighbor_x, neighbor_y))
 

@@ -34,7 +34,7 @@ class Grid:
                 #print("creating staggered endpoint bases on the direction and distance to closest object")
                 stagger_distance = safe_zone - distance
                 staggered_end_point = self.stagger_end_point(center_x, center_y, endpoint_type, direction, stagger_distance)
-                #self.add_end_point(staggered_end_point)
+                self.add_end_point(staggered_end_point)
             return
 
     #function that determines if something is close to a recently added endpoint

@@ -83,7 +83,7 @@ while True:
         # Add the goals
         left_goal_width = 200 * scale
         left_center = left.get_center()
-        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2)))
+        left_goal = Box(Vector(left.x1, left_center.y - (left_goal_width // 2)), Vector(left.x2, left_center.y + (left_goal_width // 2) - 20))
         # grid.add_endpoint(left_goal.get_center(), "goal", safe_zone=0)
 
         right_goal_width = 80 * scale
@@ -150,12 +150,24 @@ while True:
         type = grid.end_points[0]['type']
     else:
         print(f'Kører til mål ({goals["left"]["center"]})')
-        path = goals["left"]["center"]
+        path = [goals["left"]["center"]]
 
     print("Starting collection")
     robot.collect()
+    def visualize_path(grid, path, start, goal):
+        display_grid = Grid(grid.width, grid.height)
+        display_grid.grid = grid.grid.copy()
+        for pos in path:
+            display_grid.add_object(pos[0], pos[1], 2)
+        display_grid.add_object(start[0], start[1], 6)
+        display_grid.add_object(goal[0], goal[1], 9)
+        print(display_grid)
+
+    visualize_path(grid, path, robot_position['center'], grid.end_points[0])
     for position in path:
         x, y = position
+        x = int(x)
+        y = int(y)
         robot.move_to(Vector(x, y))
 
     # break
