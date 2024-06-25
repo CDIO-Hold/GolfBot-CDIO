@@ -34,7 +34,8 @@ class Connector:
                 time.sleep(sleep_time)
 
     def process_image(self, detected_objects):
-        self.grid.add_detected_object(detected_objects)
+        for obj in detected_objects:
+            self.grid.add_box(obj)
 
         self.grid = self.grid.scaled_to(128, 72)
 
@@ -62,7 +63,7 @@ class Connector:
             print('Found the position:', end_position)
             path = pathfinder.find_path(robot_position, end_position)
             print("Path:", path)
-            self.send_path(path)
+            #self.send_path(path)
         else:
             print('no endpoints')
 

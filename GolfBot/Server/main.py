@@ -17,7 +17,7 @@ scale = 1.0
 real_ball_size = 40  # mm
 while True:
     print("Taking a picture")
-    #picture = camera.take_picture()
+    picture = camera.take_picture()
 
     if picture.data is None:
         continue
@@ -64,6 +64,7 @@ while True:
 
     # initialize grid
     grid = Grid(picture.width, picture.height)
+
     if "wall" in keyed_groups:
         walls = []
         for wall_box in detected_group_to_shapes(keyed_groups["wall"]):
@@ -126,7 +127,7 @@ while True:
             robot.update_info(robot_box.get_center(), robot_angle.get_value(signed=True, unit=degrees))
             grid.add_box(robot_box, "robot")
     pathfinder = PathFinder(grid)
-
+    print(grid.scaled_to(128, 72))
     robot_info = robot.get_info()
     position = robot_info.split(" ")[0]
     x, y = (int(p.split(".")[0]) for p in position.split(","))

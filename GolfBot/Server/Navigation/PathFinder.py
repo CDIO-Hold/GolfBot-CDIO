@@ -22,10 +22,12 @@ class PathFinder:
             for neighbor in self.get_neighbors(current):
                 tentative_g_score = g_score[current] + 1
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                    print('2')
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = tentative_g_score + self.taxi_distance(neighbor, goal)
                     if neighbor not in [i[1] for i in open_set]:
+                        print('1')
                         heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
         print("No path found")
@@ -40,6 +42,7 @@ class PathFinder:
         return path
 
     def get_neighbors(self, node):
+        print('getting neighbors')
         neighbors = []
         current_x, current_y = node
 
@@ -51,8 +54,9 @@ class PathFinder:
             neighbor_x = current_x + dx
             neighbor_y = current_y + dy
             if self.is_valid_position(neighbor_x, neighbor_y):
-                if not self.will_collide(neighbor_x, neighbor_y, 50):
-                    neighbors.append((neighbor_x, neighbor_y))
+                #if not self.will_collide(neighbor_x, neighbor_y, 50):
+                print('adding a neighbor at: ' + str(neighbor_x) + ', ' + str(neighbor_y))
+                neighbors.append((neighbor_x, neighbor_y))
 
         return neighbors
 
