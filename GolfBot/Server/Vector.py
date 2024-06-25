@@ -121,3 +121,7 @@ class Vector:
     @staticmethod
     def angle_between(v, w) -> Angle:
         return AngleMath.atan2(v.y * w.x - v.x * w.y, v.x * w.x + v.y * w.y)
+
+    @staticmethod
+    def average(a, b):
+        return (a + b) * 0.5
