@@ -1,11 +1,9 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from ultralytics import YOLO
-
 from GolfBot.Robot import Robot
-from GolfBot.Shared import Ball, Wall
-from GolfBot.Basics import CardinalDirection, Egg
-from GolfBot.YOLO import Yolo
+from GolfBot.Server.Basics import CardinalDirection, Egg, Ball, Wall
+from GolfBot.Server.ImageRecognition.YOLO import Yolo
 
 
 class TestYolo(unittest.TestCase):
@@ -17,7 +15,7 @@ class TestYolo(unittest.TestCase):
         self.mock_video_capture.read.return_value = (True, MagicMock())
 
         self.yolo = Yolo()
-        self.yolo.model = YOLO('best.pt')
+        self.yolo.model = YOLO('Server/YOLO_FINAL_MODEL.pt')
         self.robot = self.yolo.robot
 
     def test_detect_ball(self):
@@ -82,7 +80,7 @@ class TestYolo(unittest.TestCase):
         egg = self.yolo.detect_egg('egg', 0, 5, 5, 10)
         self.assertIsInstance(egg, Egg)
         self.assertEqual(egg.name, 'egg')
-        self.assertEqual(egg.position.x, 2.5)
-        self.assertEqual(egg.position.y, 7.5)
+        self.assertEqual(egg.bounding_box.x, 2.5)
+        self.assertEqual(egg.bounding_box.y, 7.5)
 
     #def test_goal_on_wall(self):

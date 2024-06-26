@@ -1,7 +1,14 @@
-from Grid import Grid
-from PathFinder import PathFinder
+from Connector import Connector
+from YOLO import Yolo
+from GolfBot.Server.Navigation.Grid import Grid
 
 if __name__ == "__main__":
+    yolo = Yolo()
+    grid = Grid(1920, 1080)
+    conn = Connector(yolo, grid, capture_interval=30)
+    conn.run()
+
+    '''
     image_grid = Grid(10, 10)
     # Example detected objects with bounding box coordinates
     x1 = 5  # Starting x-coordinate of the bounding box (left edge)
@@ -55,4 +62,5 @@ if __name__ == "__main__":
         print(display_grid)
 
     visualize_path(robot_grid, path, robot_start_position, robot_end_position)
+    '''
 

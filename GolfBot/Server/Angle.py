@@ -98,3 +98,75 @@ class Angle:
 
     def __int__(self):
         return int(self.value)
+
+
+class CardinalDirection:
+    @staticmethod
+    @property
+    def EAST():
+        return Angle(0, degrees)
+
+    @staticmethod
+    @property
+    def NORTH():
+        return Angle(90, degrees)
+
+    @staticmethod
+    @property
+    def WEST():
+        return Angle(180, degrees)
+
+    @staticmethod
+    @property
+    def SOUTH():
+        return Angle(270, degrees)
+
+    @staticmethod
+    def angle_to_cardinal(angle: Angle):
+        angle = angle.get_value(signed=True, unit=degrees)
+        if 45 <= angle < 135:
+            return CardinalDirection.NORTH
+        elif -45 <= angle < 45:
+            return CardinalDirection.EAST
+        elif angle >= 135 or angle < -135:
+            return CardinalDirection.WEST
+        else:
+            return CardinalDirection.SOUTH
+
+
+class AngleMath:
+    @staticmethod
+    def acos(x) -> Angle:
+        print("Acos of " + str(x))
+        return Angle(math.acos(x), radians)
+
+    @staticmethod
+    def asin(x) -> Angle:
+        return Angle(math.asin(x), radians)
+
+    @staticmethod
+    def atan(x) -> Angle:
+        return Angle(math.atan(x), radians)
+
+    @staticmethod
+    def atan2(y, x) -> Angle:
+        return Angle(math.atan2(y, x), radians)
+
+    @staticmethod
+    def get_radians(angle) -> float:
+        if type(angle) is int or type(angle) is float:
+            return angle
+        else:
+            return angle.get_value(signed=False, unit=radians)
+
+    @staticmethod
+    def cos(x) -> float:
+        return math.cos(AngleMath.get_radians(x))
+
+    @staticmethod
+    def sin(x) -> float:
+        return math.sin(AngleMath.get_radians(x))
+
+    @staticmethod
+    def tan(x) -> float:
+        return math.tan(AngleMath.get_radians(x))
